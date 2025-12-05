@@ -18,7 +18,7 @@ fi
 
 echo ""
 echo "=============================================================="
-echo "Module: 'gnucash-api-ext'"
+echo "Module: 'gnucash-api-spec'"
 echo "=============================================================="
 
 # mvn package

@@ -1,26 +1,32 @@
-package org.gnucash.api.read.impl.spec;
+package org.gnucash.apispec.read.impl;
 
-import org.gnucash.api.generated.GncTransaction;
 import org.gnucash.api.read.GnuCashAccount;
-import org.gnucash.api.read.GnuCashFile;
+import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.GnuCashTransactionSplit;
 import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.api.read.impl.GnuCashTransactionSplitImpl;
-import org.gnucash.api.read.spec.GnuCashSimpleTransaction;
+import org.gnucash.apispec.read.GnuCashSimpleTransaction;
 import org.gnucash.base.basetypes.complex.GCshCmdtyCurrID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
+
+/**
+ * xyz
+ * 
+ * @see GnuCashTransaction
+ */
 public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 										  implements GnuCashSimpleTransaction
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GnuCashSimpleTransactionImpl.class);
+    @SuppressWarnings("unused")
+	private static final Logger LOGGER = LoggerFactory.getLogger(GnuCashSimpleTransactionImpl.class);
 
 	// ---------------------------------------------------------------
 
-	public GnuCashSimpleTransactionImpl(GncTransaction peer, GnuCashFile gcshFile, boolean addTrxToInvc) {
-		super( peer, gcshFile, addTrxToInvc );
-		// TODO Auto-generated constructor stub
+	public GnuCashSimpleTransactionImpl(GnuCashTransactionImpl trx) {
+		super(trx);
 	}
 
 	// ---------------------------------------------------------------
@@ -70,9 +76,74 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 
 	// ---------------------------------------------------------------
 	
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+    public GnuCashTransactionSplit getFirstSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplits().size() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
+    	return getSplits().get(0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+    public GnuCashTransactionSplit getSecondSplit() throws TransactionSplitNotFoundException {
+		if ( getSplits().size() <= 1 )
+			throw new TransactionSplitNotFoundException();
+
+		return getSplits().get(1);
+    }
+
+	// ---------------------------------------------------------------
+	
 	public String toString() {
-		// ::TODO
-		return "NOT IMPLEMENTED YET";
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("GnuCashSimpleTransactionImpl [");
+
+		buffer.append("id=");
+		buffer.append(getID());
+
+		buffer.append(", balance=");
+		buffer.append(getBalanceFormatted());
+
+		buffer.append(", description='");
+		buffer.append(getDescription() + "'");
+
+		buffer.append(", split1=");
+		try {
+			buffer.append(getFirstSplit().getID());
+		} catch (Exception e) {
+			buffer.append("ERROR");
+		}
+
+		buffer.append(", split2=");
+		try {
+			buffer.append(getSecondSplit().getID());
+		} catch (Exception e) {
+			buffer.append("ERROR");
+		}
+
+		buffer.append(", date-posted=");
+		try {
+			buffer.append(getDatePosted().format(DATE_POSTED_FORMAT));
+		} catch (Exception e) {
+			buffer.append(getDatePosted().toString());
+		}
+
+		buffer.append(", date-entered=");
+		try {
+			buffer.append(getDateEntered().format(DATE_ENTERED_FORMAT));
+		} catch (Exception e) {
+			buffer.append(getDateEntered().toString());
+		}
+
+		buffer.append("]");
+
+		return buffer.toString();
 	}
 	
 }

@@ -2238,14 +2238,6 @@
       <split:account type="guid">d49554f33a0340bdb6611a1ab5575998</split:account>
     </trn:split>
     <trn:split>
-      <split:id type="guid">22e449ac0a864d4fae7c58171bdcfcfc</split:id>
-      <split:memo>Leere Buchung absichtlich drinbehalten (so etwas passiert dann und wann einmal, ist nicht schlimm)</split:memo>
-      <split:reconciled-state>n</split:reconciled-state>
-      <split:value>0/100</split:value>
-      <split:quantity>0/100</split:quantity>
-      <split:account type="guid">97fe299fade74af1857573ab5b48262b</split:account>
-    </trn:split>
-    <trn:split>
       <split:id type="guid">b6a88c1d918e465892488c561e02831a</split:id>
       <split:reconciled-state>n</split:reconciled-state>
       <split:value>-225300/100</split:value>
@@ -2514,9 +2506,9 @@
   <trn:splits>
     <trn:split>
       <split:id type="guid">e9900dc4e5124b2b8ad42347a6ee6fc0</split:id>
-      <split:action>Stock</split:action>
+      <split:action>Aktienteilung</split:action>
       <split:reconciled-state>n</split:reconciled-state>
-      <split:value>0/1</split:value>
+      <split:value>0/100</split:value>
       <split:quantity>100000/10000</split:quantity>
       <split:account type="guid">b3741e92e3b9475b9d5a2dc8254a8111</split:account>
       <split:slots>

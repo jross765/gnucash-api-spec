@@ -4,5 +4,16 @@ public class TransactionValidationException extends Exception
 {
 
 	private static final long serialVersionUID = 4399087761578822362L;
+	
+	// ---------------------------------------------------------------
+	
+	/*
+	public TransactionValidationException() {
+		super();
+	}
+	*/
 
+	public TransactionValidationException(String msg) {
+		super(msg);
+	}
 }

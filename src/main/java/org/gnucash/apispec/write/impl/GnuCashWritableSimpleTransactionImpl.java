@@ -21,8 +21,11 @@ import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
 public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransactionImpl 
                                                   implements GnuCashWritableSimpleTransaction 
 {
-    @SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(GnuCashWritableSimpleTransactionImpl.class);
+
+	// ---------------------------------------------------------------
+    
+    private static final int NOF_SPLITS = 2;
 
     // -----------------------------------------------------------
 
@@ -97,50 +100,67 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
 	@Override
 	public void validate() throws Exception
 	{
-		if ( getSplitsCount() != 2 ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Number of splits is not 2");
-			throw new TransactionValidationException();
+		if ( getSplitsCount() != NOF_SPLITS ) {
+			String msg = "Trx ID " + getID() + ": Number of splits is not " + NOF_SPLITS;
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 		
 		// ---
 		
 		if ( getFirstSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Commodity/currency of first split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'");
-			throw new TransactionValidationException();
+			String msg = "Trx ID " + getID() + ": Commodity/currency of first split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'";
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 		
 		if ( getSecondSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Commodity/currency of second split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'");
-			throw new TransactionValidationException();
+			String msg = "Trx ID " + getID() + ": Commodity/currency of second split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'";
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 		
 		if ( ! getFirstSplit().getAccount().getCmdtyCurrID().getCode().equals( getSecondSplit().getAccount().getCmdtyCurrID().getCode() ) ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Commodity/currency code of the two splits are not equal");
-			throw new TransactionValidationException();
+			String msg = "Trx ID " + getID() + ": Commodity/currency code of the two splits are not equal";
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 		
 		// ---
 		
 		if ( getFirstSplit().getQuantityRat().doubleValue() != getSecondSplit().getQuantityRat().negate().doubleValue() ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Quantity of first split is not equal to negative quantity of second split");
-			throw new TransactionValidationException();
+			String msg = "Trx ID " + getID() + ": Shares of first split is not equal to negative quantity of second split";
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 		
 		if ( getFirstSplit().getValueRat().doubleValue() != getSecondSplit().getValueRat().negate().doubleValue() ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Value of first split is not equal to negative value of second split");
-			throw new TransactionValidationException();
+			String msg = "Trx ID " + getID() + ": Value of first split is not equal to negative value of second split";
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 		
 		// ---
 		
 		if ( getFirstSplit().getQuantityRat().signum() != getFirstSplit().getValueRat().signum() ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Signum of first split's quantity and value are not is not equal");
-			throw new TransactionValidationException();
+			String msg = "Trx ID " + getID() + ": Signum of first split's shares and value are not is not equal";
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 		
 		if ( getSecondSplit().getQuantityRat().signum() != getSecondSplit().getValueRat().signum() ) {
-			LOGGER.error("validate: Trx ID :" + getID() + " Signum of second split's quantity and value are not is not equal");
-			throw new TransactionValidationException();
+			String msg = "Trx ID " + getID() + ": Signum of second split's shares and value are not is not equal";
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		// ---
+		// redundant:
+		
+		if ( getBalance().doubleValue() != 0.0 ) {
+			String msg = "Trx ID :" + getID() + ": Transaction is not balanced: " + getBalance();
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
 		}
 	}
 

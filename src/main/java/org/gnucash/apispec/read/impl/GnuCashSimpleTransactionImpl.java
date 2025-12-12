@@ -27,6 +27,11 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 
 	public GnuCashSimpleTransactionImpl(GnuCashTransactionImpl trx) {
 		super(trx);
+		
+		// ::TODO ::CHECK
+		if ( trx.getSplitsCount() != 2 ) {
+			throw new IllegalStateException("argument <trx> must have two splits -- not more, not less");
+		}
 	}
 
 	// ---------------------------------------------------------------
@@ -74,6 +79,58 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 		super.addSplit( splt );
 	}
 
+	// ---------------------------------------------------------------
+	
+	@Override
+	public void validate() throws Exception
+	{
+		if ( getSplitsCount() != 2 ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Number of splits is not 2");
+			throw new TransactionValidationException();
+		}
+		
+		// ---
+		
+		if ( getFirstSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Commodity/currency of first split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'");
+			throw new TransactionValidationException();
+		}
+		
+		if ( getSecondSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Commodity/currency of second split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'");
+			throw new TransactionValidationException();
+		}
+		
+		if ( ! getFirstSplit().getAccount().getCmdtyCurrID().getCode().equals( getSecondSplit().getAccount().getCmdtyCurrID().getCode() ) ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Commodity/currency code of the two splits are not equal");
+			throw new TransactionValidationException();
+		}
+		
+		// ---
+		
+		if ( getFirstSplit().getQuantityRat().doubleValue() != getSecondSplit().getQuantityRat().negate().doubleValue() ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Quantity of first split is not equal to negative quantity of second split");
+			throw new TransactionValidationException();
+		}
+		
+		if ( getFirstSplit().getValueRat().doubleValue() != getSecondSplit().getValueRat().negate().doubleValue() ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Value of first split is not equal to negative value of second split");
+			throw new TransactionValidationException();
+		}
+		
+		// ---
+		
+		if ( getFirstSplit().getQuantityRat().signum() != getFirstSplit().getValueRat().signum() ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Signum of first split's quantity and value are not is not equal");
+			throw new TransactionValidationException();
+		}
+		
+		if ( getSecondSplit().getQuantityRat().signum() != getSecondSplit().getValueRat().signum() ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Signum of second split's quantity and value are not is not equal");
+			throw new TransactionValidationException();
+		}
+	}
+	
 	// ---------------------------------------------------------------
 	
     /**
@@ -145,5 +202,5 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 
 		return buffer.toString();
 	}
-	
+
 }

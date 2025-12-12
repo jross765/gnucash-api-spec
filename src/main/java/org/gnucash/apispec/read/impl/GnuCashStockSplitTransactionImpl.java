@@ -27,6 +27,11 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 
 	public GnuCashStockSplitTransactionImpl(GnuCashTransactionImpl trx) {
 		super( trx );
+		
+		// ::TODO ::CHECK
+		if ( trx.getSplitsCount() != 1 ) {
+			throw new IllegalStateException("argument <trx> must have one split -- not more, not less");
+		}
 	}
 	
 	// ---------------------------------------------------------------
@@ -55,6 +60,32 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 		super.addSplit( splt );
 	}
 
+	// ---------------------------------------------------------------
+	
+	@Override
+	public void validate() throws Exception
+	{
+		if ( getSplitsCount() != 1 ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Number of splits is not 1");
+			throw new TransactionValidationException();
+		}
+		
+		if ( getSplit().getAccount().getCmdtyCurrID().getType() == GCshCmdtyCurrID.Type.CURRENCY ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Commodity/currency of first split's account is of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'");
+			throw new TransactionValidationException();
+		}
+		
+		if ( getSplit().getQuantityRat().doubleValue() == 0.0 ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Quantity of the split is = 0");
+			throw new TransactionValidationException();
+		}
+		
+		if ( getSplit().getValueRat().doubleValue() != 0.0 ) {
+			LOGGER.error("validate: Trx ID :" + getID() + " Value of the split is != 0");
+			throw new TransactionValidationException();
+		}
+	}
+	
 	// ---------------------------------------------------------------
 	
     /**

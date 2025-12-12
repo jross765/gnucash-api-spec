@@ -5,7 +5,8 @@ import org.gnucash.api.read.GnuCashTransactionSplit;
 
 import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
 
-public interface GnuCashSimpleTransaction extends GnuCashTransaction
+public interface GnuCashSimpleTransaction extends GnuCashTransaction,
+												  GnuCashSpecialTransaction
 {
 
     /**

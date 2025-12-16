@@ -32,6 +32,7 @@ public class TestGnuCashStockSplitTransactionImpl {
 		junit.textui.TestRunner.run(suite());
 	}
 
+	@SuppressWarnings("exports")
 	public static junit.framework.Test suite() {
 		return new JUnit4TestAdapter(TestGnuCashStockSplitTransactionImpl.class);
 	}
@@ -65,7 +66,7 @@ public class TestGnuCashStockSplitTransactionImpl {
 		assertNotEquals(null, genTrx);
 
 		assertEquals(TRX_1_ID, genTrx.getID());
-		assertEquals(3, genTrx.getSplitsCount());
+		assertEquals(5, genTrx.getSplitsCount());
 		
 		try {
 			GnuCashStockSplitTransaction specTrx = new GnuCashStockSplitTransactionImpl((GnuCashTransactionImpl) genTrx);

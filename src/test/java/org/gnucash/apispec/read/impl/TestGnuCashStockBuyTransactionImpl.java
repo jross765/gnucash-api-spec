@@ -32,6 +32,7 @@ public class TestGnuCashStockBuyTransactionImpl {
 		junit.textui.TestRunner.run(suite());
 	}
 
+	@SuppressWarnings("exports")
 	public static junit.framework.Test suite() {
 		return new JUnit4TestAdapter(TestGnuCashStockBuyTransactionImpl.class);
 	}

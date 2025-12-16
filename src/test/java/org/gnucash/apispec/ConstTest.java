@@ -1,8 +1,7 @@
 package org.gnucash.apispec;
 
-import org.gnucash.api.Const;
-
-public class ConstTest extends Const {
+// On purpose redundant to according class in org.kmymoney.api
+public class ConstTest {
 
     public static final String GCSH_FILENAME     = "test.xml";
 

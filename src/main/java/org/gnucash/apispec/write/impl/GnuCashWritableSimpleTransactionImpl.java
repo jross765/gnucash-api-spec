@@ -1,7 +1,6 @@
 package org.gnucash.apispec.write.impl;
 
 import org.gnucash.api.read.GnuCashTransactionSplit;
-import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.api.write.GnuCashWritableTransactionSplit;
 import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
 import org.gnucash.apispec.read.impl.GnuCashSimpleTransactionImpl;
@@ -34,7 +33,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      *
      * @param trx the file we belong to
      */
-    public GnuCashWritableSimpleTransactionImpl(final GnuCashTransactionImpl trx) {
+    public GnuCashWritableSimpleTransactionImpl(final GnuCashSimpleTransactionImpl trx) {
     	super(trx);
     }
 
@@ -43,7 +42,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      *
      * @param trx the file we belong to
      */
-    public GnuCashWritableSimpleTransactionImpl(final GnuCashWritableTransactionImpl trx) {
+    public GnuCashWritableSimpleTransactionImpl(final GnuCashWritableSimpleTransactionImpl trx) {
     	super(trx);
     }
 

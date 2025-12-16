@@ -86,6 +86,8 @@ public class TestGnuCashStockDividendTransactionImpl {
 		GnuCashStockDividendTransaction specTrx = new GnuCashStockDividendTransactionImpl((GnuCashTransactionImpl) genTrx);
 		assertNotEquals(null, specTrx);
 		
+		// ---
+		
 		assertEquals(5, specTrx.getSplitsCount());
 		
 		assertEquals("ea08a144322146cea38b39d134ca6fc1", specTrx.getStockAccountSplit().getID().toString());
@@ -100,6 +102,8 @@ public class TestGnuCashStockDividendTransactionImpl {
 		assertEquals(specTrx.getSplits().get(2).toString(), specTrx.getExpensesSplits().get(0).toString());
 		assertEquals(specTrx.getSplits().get(3).toString(), specTrx.getExpensesSplits().get(1).toString());
 		assertEquals(specTrx.getSplits().get(4).toString(), specTrx.getIncomeAccountSplit().toString());
+		
+		// ---
 		
 		try {
 			specTrx.validate();

@@ -9,4 +9,8 @@ public class ConstTest {
 
     public static final String GCSH_FILENAME_OUT = "test_out.xml";
     
+    // -----------------------------------------------------------------
+
+    public static final double DIFF_TOLERANCE = 0.005;
+
 }

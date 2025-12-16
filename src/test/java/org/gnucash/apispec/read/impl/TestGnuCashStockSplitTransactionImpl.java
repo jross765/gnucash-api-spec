@@ -86,11 +86,15 @@ public class TestGnuCashStockSplitTransactionImpl {
 		GnuCashStockSplitTransaction specTrx = new GnuCashStockSplitTransactionImpl((GnuCashTransactionImpl) genTrx);
 		assertNotEquals(null, specTrx);
 		
+		// ---
+		
 		assertEquals(1, specTrx.getSplitsCount());
 		
 		assertEquals("e9900dc4e5124b2b8ad42347a6ee6fc0", specTrx.getSplit().getID().toString());
 		
 		assertEquals(specTrx.getSplits().get(0).toString(), specTrx.getSplit().toString());
+		
+		// ---
 		
 		try {
 			specTrx.validate();

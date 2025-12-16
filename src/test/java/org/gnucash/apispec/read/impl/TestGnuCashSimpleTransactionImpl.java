@@ -86,13 +86,22 @@ public class TestGnuCashSimpleTransactionImpl {
 		GnuCashSimpleTransaction specTrx = new GnuCashSimpleTransactionImpl((GnuCashTransactionImpl) genTrx);
 		assertNotEquals(null, specTrx);
 		
+		// ---
+		
 		assertEquals(2, specTrx.getSplitsCount());
 		
 		assertEquals("b65f76a37e5643b1ac2ea2ad9cdf381d", specTrx.getFirstSplit().getID().toString());
+		assertEquals(150.0, specTrx.getFirstSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(150.0, specTrx.getFirstSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		
 		assertEquals("48657aca121b4500baef4078a3982c03", specTrx.getSecondSplit().getID().toString());
+		assertEquals(-150.0, specTrx.getSecondSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(-150.0, specTrx.getSecondSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
 		
 		assertEquals(specTrx.getSplits().get(0).getID().toString(), specTrx.getFirstSplit().getID().toString());
 		assertEquals(specTrx.getSplits().get(1).getID().toString(), specTrx.getSecondSplit().getID().toString());
+		
+		// ---
 		
 		try {
 			specTrx.validate();

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.io.InputStream;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashFile;
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.impl.GnuCashFileImpl;
@@ -100,6 +101,26 @@ public class TestGnuCashStockBuyTransactionImpl {
 		assertEquals(specTrx.getSplits().get(1).toString(), specTrx.getExpensesSplits().get(0).toString());
 		assertEquals(specTrx.getSplits().get(2).toString(), specTrx.getExpensesSplits().get(1).toString());
 		assertEquals(specTrx.getSplits().get(3).toString(), specTrx.getOffsettingAccountSplit().toString());
+		
+		// ---
+		
+		assertEquals(15.0,    specTrx.getNofShares().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(125.0,   specTrx.getPricePerShare().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(1875.0,  specTrx.getNetPrice().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(4.15,    specTrx.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(1879.15, specTrx.getGrossPrice().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		
+		assertEquals(BigFraction.of(15, 1),     specTrx.getNofSharesRat());
+		assertEquals(BigFraction.of(125, 1),    specTrx.getPricePerShareRat());
+		assertEquals(BigFraction.of(1875, 1),   specTrx.getNetPriceRat());
+		assertEquals(BigFraction.of(83, 20),    specTrx.getFeesTaxesRat());
+		assertEquals(BigFraction.of(37583, 20), specTrx.getGrossPriceRat());
+		
+		assertEquals(specTrx.getNofSharesRat().doubleValue(),     specTrx.getNofShares().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getPricePerShareRat().doubleValue(), specTrx.getPricePerShare().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getNetPriceRat().doubleValue(),      specTrx.getNetPrice().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getFeesTaxesRat().doubleValue(),     specTrx.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getGrossPriceRat().doubleValue(),    specTrx.getGrossPrice().doubleValue(), ConstTest.DIFF_TOLERANCE);
 		
 		// ---
 		

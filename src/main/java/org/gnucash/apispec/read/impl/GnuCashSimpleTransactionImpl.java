@@ -1,5 +1,6 @@
 package org.gnucash.apispec.read.impl;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashAccount;
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.GnuCashTransactionSplit;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
+import xyz.schnorxoborx.base.numbers.FixedPointNumber;
 
 /**
  * xyz
@@ -178,6 +180,16 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 		return getSplits().get(1);
     }
 
+    // ---------------------------------------------------------------
+    
+    public FixedPointNumber getAmount() throws TransactionSplitNotFoundException {
+    	return getSecondSplit().getValue();
+    }
+    
+    public BigFraction getAmountRat() throws TransactionSplitNotFoundException {
+    	return getSecondSplit().getValueRat();
+    }
+    
 	// ---------------------------------------------------------------
 	
 	@Override
@@ -204,6 +216,13 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 		buffer.append(", split2=");
 		try {
 			buffer.append(getSecondSplit().getID());
+		} catch (Exception e) {
+			buffer.append("ERROR");
+		}
+
+		buffer.append(", amount=");
+		try {
+			buffer.append(getAmount());
 		} catch (Exception e) {
 			buffer.append("ERROR");
 		}

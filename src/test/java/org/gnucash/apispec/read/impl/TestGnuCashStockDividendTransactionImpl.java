@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.io.InputStream;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashFile;
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.impl.GnuCashFileImpl;
@@ -102,6 +103,20 @@ public class TestGnuCashStockDividendTransactionImpl {
 		assertEquals(specTrx.getSplits().get(2).toString(), specTrx.getExpensesSplits().get(0).toString());
 		assertEquals(specTrx.getSplits().get(3).toString(), specTrx.getExpensesSplits().get(1).toString());
 		assertEquals(specTrx.getSplits().get(4).toString(), specTrx.getIncomeAccountSplit().toString());
+		
+		// ---
+		
+		assertEquals(11.0, specTrx.getGrossDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(2.93, specTrx.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(8.07, specTrx.getNetDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		
+		assertEquals(BigFraction.of(11, 1),    specTrx.getGrossDividendRat());
+		assertEquals(BigFraction.of(293, 100), specTrx.getFeesTaxesRat());
+		assertEquals(BigFraction.of(807, 100), specTrx.getNetDividendRat());
+		
+		assertEquals(specTrx.getGrossDividendRat().doubleValue(), specTrx.getGrossDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getFeesTaxesRat().doubleValue(),     specTrx.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getNetDividendRat().doubleValue(),   specTrx.getNetDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
 		
 		// ---
 		

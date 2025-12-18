@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.io.InputStream;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashFile;
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.impl.GnuCashFileImpl;
@@ -93,6 +94,23 @@ public class TestGnuCashStockSplitTransactionImpl {
 		assertEquals("e9900dc4e5124b2b8ad42347a6ee6fc0", specTrx.getSplit().getID().toString());
 		
 		assertEquals(specTrx.getSplits().get(0).toString(), specTrx.getSplit().toString());
+		
+		// ---
+		
+		assertEquals(10.0, specTrx.getNofAddShares().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(3.0,  specTrx.getSplitFactor().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(5.0,  specTrx.getNofSharesBeforeSplit().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(15.0, specTrx.getNofSharesAfterSplit().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		
+		assertEquals(BigFraction.of(10, 1), specTrx.getNofAddSharesRat());
+		assertEquals(BigFraction.of(3, 1),  specTrx.getSplitFactorRat());
+		assertEquals(BigFraction.of(5, 1),  specTrx.getNofSharesBeforeSplitRat());
+		assertEquals(BigFraction.of(15, 1), specTrx.getNofSharesAfterSplitRat());
+		
+		assertEquals(specTrx.getNofAddSharesRat().doubleValue(),         specTrx.getNofAddShares().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getSplitFactorRat().doubleValue(),          specTrx.getSplitFactor().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getNofSharesBeforeSplitRat().doubleValue(), specTrx.getNofSharesBeforeSplit().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrx.getNofSharesAfterSplitRat().doubleValue(),  specTrx.getNofSharesAfterSplit().doubleValue(), ConstTest.DIFF_TOLERANCE);
 		
 		// ---
 		

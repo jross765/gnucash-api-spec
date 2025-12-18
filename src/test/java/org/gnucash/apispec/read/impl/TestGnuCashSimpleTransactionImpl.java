@@ -91,15 +91,19 @@ public class TestGnuCashSimpleTransactionImpl {
 		assertEquals(2, specTrx.getSplitsCount());
 		
 		assertEquals("b65f76a37e5643b1ac2ea2ad9cdf381d", specTrx.getFirstSplit().getID().toString());
-		assertEquals(150.0, specTrx.getFirstSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
-		assertEquals(150.0, specTrx.getFirstSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(150.0, specTrx.getFirstSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(150.0, specTrx.getFirstSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE);
 		
 		assertEquals("48657aca121b4500baef4078a3982c03", specTrx.getSecondSplit().getID().toString());
-		assertEquals(-150.0, specTrx.getSecondSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
-		assertEquals(-150.0, specTrx.getSecondSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(-150.0, specTrx.getSecondSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(-150.0, specTrx.getSecondSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE);
 		
 		assertEquals(specTrx.getSplits().get(0).getID().toString(), specTrx.getFirstSplit().getID().toString());
 		assertEquals(specTrx.getSplits().get(1).getID().toString(), specTrx.getSecondSplit().getID().toString());
+		
+		// ---
+		
+		assertEquals(-150.0, specTrx.getAmount().doubleValue(), ConstTest.DIFF_TOLERANCE);
 		
 		// ---
 		

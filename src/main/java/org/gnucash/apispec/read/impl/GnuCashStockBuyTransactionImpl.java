@@ -3,6 +3,7 @@ package org.gnucash.apispec.read.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashAccount;
 import org.gnucash.api.read.GnuCashCommodity;
 import org.gnucash.api.read.GnuCashTransaction;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
+import xyz.schnorxoborx.base.numbers.FixedPointNumber;
 
 /**
  * xyz
@@ -390,6 +392,116 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 		return null;
 	}
 	
+	// ---------------------------------------------------------------
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FixedPointNumber getNofShares() throws TransactionSplitNotFoundException {
+		return getStockAccountSplit().getQuantity();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BigFraction getNofSharesRat() throws TransactionSplitNotFoundException {
+		return getStockAccountSplit().getQuantityRat();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public FixedPointNumber getPricePerShare()  throws TransactionSplitNotFoundException {
+		FixedPointNumber result = getNetPrice();
+		
+		result.divide( getNofShares() ); // mutable
+		
+		return result;
+    }
+    
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public BigFraction getPricePerShareRat()  throws TransactionSplitNotFoundException {
+    	BigFraction result = getNetPriceRat();
+		
+		result = result.divide( getNofSharesRat() ); // immutable
+		
+		return result;
+    }
+    
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FixedPointNumber getNetPrice() throws TransactionSplitNotFoundException {
+		FixedPointNumber result = getGrossPrice();
+		
+		result.subtract( getFeesTaxes() ); // mutable
+		
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BigFraction getNetPriceRat() throws TransactionSplitNotFoundException {
+		BigFraction result = getGrossPriceRat();
+		
+		result = result.subtract( getFeesTaxesRat() ); // immutable
+		
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FixedPointNumber getFeesTaxes() throws TransactionSplitNotFoundException {
+		FixedPointNumber result = FixedPointNumber.ZERO.copy(); // Caution: FPN is mutable!
+		
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			result.add( splt.getValue() ); // mutable
+		}
+		
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BigFraction getFeesTaxesRat() throws TransactionSplitNotFoundException {
+		BigFraction result = BigFraction.ZERO; // Caution: BF is immutable
+		
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			result = result.add( splt.getValueRat() ); // immutable
+		}
+		
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FixedPointNumber getGrossPrice() throws TransactionSplitNotFoundException {
+		return getOffsettingAccountSplit().getValue().negate(); // Notice: negate
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BigFraction getGrossPriceRat() throws TransactionSplitNotFoundException {
+		return getOffsettingAccountSplit().getValueRat().negate(); // Notice: negate
+	}
+
 	// ---------------------------------------------------------------
 	
 	@Override

@@ -1,5 +1,6 @@
 package org.gnucash.apispec.read.impl;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashAccount;
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.GnuCashTransactionSplit;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
+import xyz.schnorxoborx.base.numbers.FixedPointNumber;
 
 /**
  * xyz
@@ -114,6 +116,69 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 	// ---------------------------------------------------------------
 	
 	@Override
+	public FixedPointNumber getSplitFactor() throws TransactionSplitNotFoundException {
+		return getNofSharesAfterSplit().divide( getNofSharesBeforeSplit() );
+	}
+
+	@Override
+	public BigFraction getSplitFactorRat() throws TransactionSplitNotFoundException {
+		return getNofSharesAfterSplitRat().divide( getNofSharesBeforeSplitRat() );
+	}
+
+	@Override
+	public FixedPointNumber getNofAddShares() throws TransactionSplitNotFoundException {
+		return getSplit().getQuantity();
+	}
+
+	@Override
+	public BigFraction getNofAddSharesRat() throws TransactionSplitNotFoundException {
+		return getSplit().getQuantityRat();
+	}
+	
+	@Override
+	public FixedPointNumber getNofSharesBeforeSplit() throws TransactionSplitNotFoundException {
+		GnuCashAccount acct = getSplit().getAccount();
+		return acct.getBalance(getPreviousSplit());
+	}
+
+	@Override
+	public BigFraction getNofSharesBeforeSplitRat() throws TransactionSplitNotFoundException {
+		GnuCashAccount acct = getSplit().getAccount();
+		return acct.getBalanceRat(getPreviousSplit());
+	}
+
+	@Override
+	public FixedPointNumber getNofSharesAfterSplit() throws TransactionSplitNotFoundException {
+		GnuCashAccount acct = getSplit().getAccount();
+		return acct.getBalance(getSplit());
+	}
+	
+	@Override
+	public BigFraction getNofSharesAfterSplitRat() throws TransactionSplitNotFoundException {
+		GnuCashAccount acct = getSplit().getAccount();
+		return acct.getBalanceRat(getSplit());
+	}
+	
+	// ----------------------------
+	
+	public GnuCashTransactionSplit getPreviousSplit() throws TransactionSplitNotFoundException {
+		GnuCashAccount acct = getSplit().getAccount();
+		
+		GnuCashTransactionSplit prevSplt = null;
+		for ( GnuCashTransactionSplit splt : acct.getTransactionSplits() ) {
+			if ( splt.getID().equals( getSplit().getID() )) {
+				return prevSplt;
+			}
+			
+			prevSplt = splt;
+		}
+		
+		return null;
+	}
+
+	// ---------------------------------------------------------------
+	
+	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("GnuCashStockSplitTransactionImpl [");
@@ -152,5 +217,5 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 
 		return buffer.toString();
 	}
-	
+
 }

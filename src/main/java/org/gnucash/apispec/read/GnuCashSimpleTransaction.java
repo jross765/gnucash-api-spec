@@ -1,9 +1,11 @@
 package org.gnucash.apispec.read;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.GnuCashTransactionSplit;
 
 import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
+import xyz.schnorxoborx.base.numbers.FixedPointNumber;
 
 public interface GnuCashSimpleTransaction extends GnuCashTransaction,
 												  GnuCashSpecialTransaction
@@ -23,7 +25,7 @@ public interface GnuCashSimpleTransaction extends GnuCashTransaction,
      * @see #getSplits()
      * @see #getSplitsCount()
     */
-    public GnuCashTransactionSplit getFirstSplit()  throws TransactionSplitNotFoundException;
+    GnuCashTransactionSplit getFirstSplit()  throws TransactionSplitNotFoundException;
     
     /**
      * @return the second split of this transaction or null.
@@ -38,6 +40,11 @@ public interface GnuCashSimpleTransaction extends GnuCashTransaction,
      * @see #getSplits()
      * @see #getSplitsCount()
      */
-	public GnuCashTransactionSplit getSecondSplit() throws TransactionSplitNotFoundException;
+	GnuCashTransactionSplit getSecondSplit() throws TransactionSplitNotFoundException;
 
+    // ---------------------------------------------------------------
+    
+    FixedPointNumber getAmount() throws TransactionSplitNotFoundException;
+    
+    BigFraction      getAmountRat() throws TransactionSplitNotFoundException;
 }

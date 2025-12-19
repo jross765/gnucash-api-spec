@@ -13,6 +13,27 @@ This module provides specialized entities (classes) that are based on more gener
 * Under normal circumstances, you cannot compile it on its own (at least not without further preparation), but instead, you should clone it together with the other repos and use the parent repo's build-script.
 
 ## Major Changes
+### V. 0.1 &rarr; 0.2
+Introduced:
+
+* `GnuCashStockDividendTransaction`
+
+Improvements:
+
+Added to the real added value of this module's classes: More non-trivial special methods:
+
+* `GnuCashSimpleTransaction`: Introduced new special methods: `getAmount()`
+
+* `GnuCashStockBuyTransaction`: Introduced new special methods: `getGrossPrice()`, `getNetPrice()`, `getFeesTaxes()`
+
+* `GnuCashStockSplitTransaction`: Introduced new special methods: `getNofAddShares()`, `getSplitFactor()`, `getNofSharesBeforeSplit()`, `getNofSharesAfterSplit()`
+
+For all the above-mentioned new methods: The `BigFraction` variant, as well.
+
+* `GnuCashWritableSimpleTransaction`: Now proper implementation and test cases / data.
+
+* Overall: A few minor improvements here and there.
+
 ### V. 0.1
 New.
 
@@ -29,8 +50,7 @@ Introduced:
 * Other kinds of special transactions, e.g.:
 
   * Single transactions:
-    * Stock/security buy/sell transaction
-    * Dividend transaction
+    * Stock/security sell transaction
     * Foreign currency transaction
     * Impairment transaction
     * Salary payment transaction

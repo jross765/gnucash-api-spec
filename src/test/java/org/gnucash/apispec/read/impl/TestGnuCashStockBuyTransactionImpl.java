@@ -3,7 +3,8 @@ package org.gnucash.apispec.read.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.io.InputStream;
+import java.io.File;
+import java.net.URL;
 
 import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashFile;
@@ -25,7 +26,7 @@ public class TestGnuCashStockBuyTransactionImpl {
 	
 	// -----------------------------------------------------------------
 
-	private GnuCashFile kmmFile = null;
+	private GnuCashFile gcshFile = null;
 
 	// -----------------------------------------------------------------
 
@@ -41,18 +42,20 @@ public class TestGnuCashStockBuyTransactionImpl {
 	@Before
 	public void initialize() throws Exception {
 		ClassLoader classLoader = getClass().getClassLoader();
-		// URL kmmFileURL = classLoader.getResource(Const.GCsh_FILENAME);
-		// System.err.println("GnuCash test file resource: '" + kmmFileURL + "'");
-		InputStream kmmFileStream = null;
+		// URL gcshFileURL = classLoader.getResource(Const.GCSH_FILENAME);
+		// System.err.println("GnuCash test file resource: '" + gcshFileURL + "'");
+		URL gcshFileURL = null;
+		File gcshFileRaw = null;
 		try {
-			kmmFileStream = classLoader.getResourceAsStream(ConstTest.GCSH_FILENAME);
+			gcshFileURL = classLoader.getResource(ConstTest.GCSH_FILENAME);
+			gcshFileRaw = new File(gcshFileURL.getFile());
 		} catch (Exception exc) {
 			System.err.println("Cannot generate input stream from resource");
 			return;
 		}
 
 		try {
-			kmmFile = new GnuCashFileImpl(kmmFileStream);
+			gcshFile = new GnuCashFileImpl(gcshFileRaw);
 		} catch (Exception exc) {
 			System.err.println("Cannot parse GnuCash file");
 			exc.printStackTrace();
@@ -63,7 +66,7 @@ public class TestGnuCashStockBuyTransactionImpl {
 
 	@Test
 	public void test01() throws Exception {
-		GnuCashTransaction genTrx = kmmFile.getTransactionByID(TRX_4_ID);
+		GnuCashTransaction genTrx = gcshFile.getTransactionByID(TRX_4_ID);
 		assertNotEquals(null, genTrx);
 
 		assertEquals(TRX_4_ID, genTrx.getID());
@@ -79,7 +82,7 @@ public class TestGnuCashStockBuyTransactionImpl {
 
 	@Test
 	public void test02() throws Exception {
-		GnuCashTransaction genTrx = kmmFile.getTransactionByID(TRX_1_ID);
+		GnuCashTransaction genTrx = gcshFile.getTransactionByID(TRX_1_ID);
 		assertNotEquals(null, genTrx);
 
 		assertEquals(TRX_1_ID, genTrx.getID());

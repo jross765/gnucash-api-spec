@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.File;
-import java.io.InputStream;
+import java.net.URL;
 
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.impl.GnuCashFileImpl;
@@ -66,16 +66,18 @@ public class TestGnuCashWritableSimpleTransactionImpl {
 		ClassLoader classLoader = getClass().getClassLoader();
 		// URL gcshFileURL = classLoader.getResource(Const.GCSH_FILENAME);
 		// System.err.println("GnuCash test file resource: '" + gcshFileURL + "'");
-		InputStream gcshInFileStream = null;
+		URL gcshInFileURL = null;
+		File gcshInFileRaw = null;
 		try {
-			gcshInFileStream = classLoader.getResourceAsStream(ConstTest.GCSH_FILENAME_IN);
+			gcshInFileURL = classLoader.getResource(ConstTest.GCSH_FILENAME);
+			gcshInFileRaw = new File(gcshInFileURL.getFile());
 		} catch (Exception exc) {
 			System.err.println("Cannot generate input stream from resource");
 			return;
 		}
 
 		try {
-			gcshInFile = new GnuCashWritableFileImpl(gcshInFileStream);
+			gcshInFile = new GnuCashWritableFileImpl(gcshInFileRaw);
 		} catch (Exception exc) {
 			System.err.println("Cannot parse GnuCash in-file");
 			exc.printStackTrace();
@@ -122,6 +124,9 @@ public class TestGnuCashWritableSimpleTransactionImpl {
 		assertEquals(specTrxRW.getSplits().get(0).getID().toString(), specTrxRW.getFirstSplit().getID().toString());
 		assertEquals(specTrxRW.getSplits().get(1).getID().toString(), specTrxRW.getSecondSplit().getID().toString());
 		
+		// ---
+		
+		assertEquals(-150.0, specTrxRW.getAmount().doubleValue(), ConstTest.DIFF_TOLERANCE);
 		// ---
 		
 		try {
@@ -207,6 +212,54 @@ public class TestGnuCashWritableSimpleTransactionImpl {
 		test02_1_check_persisted(outFile);
 	}
 
+	@Test
+	public void test02_2() throws Exception {
+		GnuCashWritableTransaction genTrx = gcshInFile.getWritableTransactionByID(TRX_4_ID);
+		assertNotEquals(null, genTrx);
+		assertEquals(TRX_4_ID, genTrx.getID());
+		
+		GnuCashSimpleTransactionImpl specTrxRO = new GnuCashSimpleTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
+		assertNotEquals(null, specTrxRO);
+		assertEquals(TRX_4_ID, specTrxRO.getID());
+
+		GnuCashWritableSimpleTransaction specTrxRW = new GnuCashWritableSimpleTransactionImpl((GnuCashSimpleTransactionImpl) specTrxRO);
+		assertNotEquals(null, specTrxRW);
+		assertEquals(TRX_4_ID, specTrxRW.getID());
+		
+		// ----------------------------
+		// Modify the object
+
+		specTrxRW.setAmount(new FixedPointNumber("300"));
+
+		try {
+			specTrxRW.validate();
+			assertEquals(0, 0);
+		} catch ( Exception ext ) {
+			assertEquals(0, 1);
+		}
+		
+		// ----------------------------
+		// Check whether the object can has actually be modified
+		// (in memory, not in the file yet).
+
+		test02_2_check_memory(specTrxRW);
+
+		// ----------------------------
+		// Now, check whether the modified object can be written to the
+		// output file, then re-read from it, and whether is is what
+		// we expect it is.
+
+		File outFile = folder.newFile(ConstTest.GCSH_FILENAME_OUT);
+		// System.err.println("Outfile for TestGnuCashWritableCustomerImpl.test01_1: '"
+		// + outFile.getPath() + "'");
+		outFile.delete(); // sic, the temp. file is already generated (empty),
+		// and the GnuCash file writer does not like that.
+		gcshInFile.writeFile(outFile);
+
+		// Not necessary:
+		// test02_2_check_persisted(outFile);
+	}
+
 	// ---------------------------------------------------------------
 
 	private void test02_1_check_memory(GnuCashWritableSimpleTransaction trx) throws Exception {
@@ -219,6 +272,8 @@ public class TestGnuCashWritableSimpleTransactionImpl {
 		assertEquals("48657aca121b4500baef4078a3982c03", trx.getSecondSplit().getID().toString()); // unchanged
 		assertEquals(-200.0, trx.getSecondSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
 		assertEquals(-200.0, trx.getSecondSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+
+		assertEquals(-200.0, trx.getAmount().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
 	}
 
 	private void test02_1_check_persisted(File outFile) throws Exception {
@@ -244,6 +299,24 @@ public class TestGnuCashWritableSimpleTransactionImpl {
 		assertEquals("48657aca121b4500baef4078a3982c03", specTrxRO.getSecondSplit().getID().toString()); // unchanged
 		assertEquals(-200.0, specTrxRO.getSecondSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
 		assertEquals(-200.0, specTrxRO.getSecondSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+
+		assertEquals(-200.0, specTrxRO.getAmount().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+	}
+
+	// ---------------------------------------------------------------
+
+	private void test02_2_check_memory(GnuCashWritableSimpleTransaction trx) throws Exception {
+		assertEquals(2, trx.getSplitsCount()); // unchanged
+		
+		assertEquals("b65f76a37e5643b1ac2ea2ad9cdf381d", trx.getFirstSplit().getID().toString()); // unchanged
+		assertEquals(-300.0, trx.getFirstSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(-300.0, trx.getFirstSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		
+		assertEquals("48657aca121b4500baef4078a3982c03", trx.getSecondSplit().getID().toString()); // unchanged
+		assertEquals(300.0, trx.getSecondSplit().getQuantity().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(300.0, trx.getSecondSplit().getValue().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+
+		assertEquals(300.0, trx.getAmount().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
 	}
 
 	// -----------------------------------------------------------------

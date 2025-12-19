@@ -1,5 +1,6 @@
 package org.gnucash.apispec.write.impl;
 
+import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashTransactionSplit;
 import org.gnucash.api.write.GnuCashWritableTransactionSplit;
 import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
+import xyz.schnorxoborx.base.numbers.FixedPointNumber;
 
 /**
  * xyz.
@@ -93,6 +95,56 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
 
 		return getSplits().get(1);
 	}
+
+    // ----------------------------
+    
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public FixedPointNumber getAmount() throws TransactionSplitNotFoundException
+	{
+    	return getSecondSplit().getValue();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public BigFraction getAmountRat() throws TransactionSplitNotFoundException
+	{
+    	return getSecondSplit().getValueRat();
+	}
+
+    // ---------------------------------------------------------------
+    
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+    public void setAmount(FixedPointNumber amt) throws TransactionSplitNotFoundException {
+		FixedPointNumber amtNeg = amt.copy().negate(); // Caution: FixedPointNumber is mutable!
+		
+    	getWritableFirstSplit().setQuantity(amtNeg);
+    	getWritableFirstSplit().setValue(amtNeg);
+		
+    	getWritableSecondSplit().setQuantity(amt);
+    	getWritableSecondSplit().setValue(amt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+    public void setAmount(BigFraction amt) throws TransactionSplitNotFoundException {
+		BigFraction amtNeg = amt.negate();
+		
+    	getWritableFirstSplit().setQuantity(amtNeg);
+    	getWritableFirstSplit().setValue(amtNeg);
+		
+    	getWritableSecondSplit().setQuantity(amt);
+    	getWritableSecondSplit().setValue(amt);
+    }
 
     // ---------------------------------------------------------------
     
@@ -189,6 +241,13 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
 		buffer.append(", split2=");
 		try {
 			buffer.append(getSecondSplit().getID());
+		} catch (Exception e) {
+			buffer.append("ERROR");
+		}
+
+		buffer.append(", amount=");
+		try {
+			buffer.append(getAmount());
 		} catch (Exception e) {
 			buffer.append("ERROR");
 		}

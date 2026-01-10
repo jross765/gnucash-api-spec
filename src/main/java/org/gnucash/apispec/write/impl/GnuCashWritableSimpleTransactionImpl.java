@@ -54,7 +54,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
     public GnuCashWritableTransactionSplit getWritableFirstSplit() throws TransactionSplitNotFoundException {
-    	if ( getSplits().size() == 0 )
+    	if ( getSplitsCount() <= 0 )
     		throw new TransactionSplitNotFoundException();
 	
     	return (GnuCashWritableTransactionSplit) getFirstSplit();
@@ -64,7 +64,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
     public GnuCashWritableTransactionSplit getWritableSecondSplit()  throws TransactionSplitNotFoundException {
-		if ( getSplits().size() <= 1 )
+    	if ( getSplitsCount() <= 1 )
 			throw new TransactionSplitNotFoundException();
 
     	return (GnuCashWritableTransactionSplit) getSplits().get(1);
@@ -76,9 +76,8 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
-	public GnuCashTransactionSplit getFirstSplit() throws TransactionSplitNotFoundException
-	{
-    	if ( getSplits().size() == 0 )
+	public GnuCashTransactionSplit getFirstSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() < 1 )
     		throw new TransactionSplitNotFoundException();
 	
     	return getSplits().get(0);
@@ -88,9 +87,8 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
-	public GnuCashTransactionSplit getSecondSplit() throws TransactionSplitNotFoundException
-	{
-		if ( getSplits().size() <= 1 )
+	public GnuCashTransactionSplit getSecondSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() < 2 )
 			throw new TransactionSplitNotFoundException();
 
 		return getSplits().get(1);
@@ -102,8 +100,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
-	public FixedPointNumber getAmount() throws TransactionSplitNotFoundException
-	{
+	public FixedPointNumber getAmount() throws TransactionSplitNotFoundException {
     	return getSecondSplit().getValue();
 	}
 
@@ -111,8 +108,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
-	public BigFraction getAmountRat() throws TransactionSplitNotFoundException
-	{
+	public BigFraction getAmountRat() throws TransactionSplitNotFoundException {
     	return getSecondSplit().getValueRat();
 	}
 
@@ -122,7 +118,16 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
-    public void setAmount(FixedPointNumber amt) throws TransactionSplitNotFoundException {
+    public void setAmount(final FixedPointNumber amt) throws TransactionSplitNotFoundException {
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		// CAUTION: < 0 is valid
+		if ( amt.equals(FixedPointNumber.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is <= 0");
+		}
+		
 		FixedPointNumber amtNeg = amt.copy().negate(); // Caution: FixedPointNumber is mutable!
 		
     	getWritableFirstSplit().setQuantity(amtNeg);
@@ -136,7 +141,16 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
-    public void setAmount(BigFraction amt) throws TransactionSplitNotFoundException {
+    public void setAmount(final BigFraction amt) throws TransactionSplitNotFoundException {
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		// CAUTION: < 0 is valid
+		if ( amt.equals(BigFraction.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is <= 0");
+		}
+		
 		BigFraction amtNeg = amt.negate();
 		
     	getWritableFirstSplit().setQuantity(amtNeg);
@@ -149,8 +163,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
     // ---------------------------------------------------------------
     
 	@Override
-	public void validate() throws Exception
-	{
+	public void validate() throws Exception {
 		if ( getSplitsCount() != NOF_SPLITS ) {
 			String msg = "Trx ID " + getID() + ": Number of splits is not " + NOF_SPLITS;
 			LOGGER.error("validate: " + msg);

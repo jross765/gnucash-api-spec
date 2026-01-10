@@ -32,7 +32,7 @@ public interface GnuCashWritableSimpleTransaction extends GnuCashWritableTransac
      * @see #getWritableFirstSplit()
      */
     GnuCashWritableTransactionSplit getWritableSecondSplit() throws TransactionSplitNotFoundException;
-    
+
     // ---------------------------------------------------------------
     
     void setAmount(FixedPointNumber amt) throws TransactionSplitNotFoundException;

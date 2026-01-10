@@ -39,7 +39,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
     private static final int NOF_SPLITS_STOCK = 1;
     
     private static final int NOF_SPLITS_FEES_TAXES_MIN = 0;
-    private static final int NOF_SPLITS_FEES_TAXES_MAX = 4; // more is unplausible
+    private static final int NOF_SPLITS_FEES_TAXES_MAX = 4; // more is implausible
 
     private static final int NOF_SPLITS_OFFSETTING = 1;
     
@@ -351,6 +351,9 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 	@Override
 	public GnuCashTransactionSplit getStockAccountSplit() throws TransactionSplitNotFoundException
 	{
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
 		for ( GnuCashTransactionSplit splt : getSplits() ) {
 			if ( splt.getAccount().getType() == GnuCashAccount.Type.STOCK ) {
 				return splt;
@@ -366,6 +369,9 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 	@Override
 	public List<GnuCashTransactionSplit> getExpensesSplits() throws TransactionSplitNotFoundException
 	{
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
 		List<GnuCashTransactionSplit> result = new ArrayList<GnuCashTransactionSplit>();
 		
 		for ( GnuCashTransactionSplit splt : getSplits() ) {
@@ -383,6 +389,9 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 	@Override
 	public GnuCashTransactionSplit getOffsettingAccountSplit() throws TransactionSplitNotFoundException
 	{
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
 		for ( GnuCashTransactionSplit splt : getSplits() ) {
 			if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ) {
 				return splt;

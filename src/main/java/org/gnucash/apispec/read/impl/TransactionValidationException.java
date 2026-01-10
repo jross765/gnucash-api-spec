@@ -16,4 +16,5 @@ public class TransactionValidationException extends Exception
 	public TransactionValidationException(String msg) {
 		super(msg);
 	}
+
 }

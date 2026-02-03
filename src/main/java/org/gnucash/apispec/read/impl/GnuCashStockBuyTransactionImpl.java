@@ -11,7 +11,8 @@ import org.gnucash.api.read.GnuCashTransactionSplit;
 import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.api.read.impl.GnuCashTransactionSplitImpl;
 import org.gnucash.apispec.read.GnuCashStockBuyTransaction;
-import org.gnucash.base.basetypes.complex.GCshCmdtyCurrID;
+import org.gnucash.base.basetypes.complex.GCshCmdtyID;
+import org.gnucash.base.basetypes.complex.GCshSecID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -249,7 +250,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getAccount().getCmdtyCurrID().getType() == GCshCmdtyCurrID.Type.CURRENCY ) {
+		if ( splt.getAccount().getCmdtyID().getType() == GCshCmdtyID.Type.CURRENCY ) {
 			String msg = "the split's account's security/currency is not valid";
 			LOGGER.error("validateStockAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
@@ -281,7 +282,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
+		if ( splt.getAccount().getCmdtyID().getType() != GCshCmdtyID.Type.CURRENCY ) {
 			String msg = "the split's account's security/currency is not valid";
 			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
@@ -318,7 +319,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
+		if ( splt.getAccount().getCmdtyID().getType() != GCshCmdtyID.Type.CURRENCY ) {
 			String msg = "the split's account's security/currency is not valid";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
@@ -580,9 +581,9 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 			buffer.append("   o Stock acct split: ");
 			buffer.append("ID: " + getStockAccountSplit().getID() + ", ");
 			buffer.append("acct: " + getStockAccountSplit().getAccount().getQualifiedName() + ", ");
-			GCshCmdtyCurrID cmdtyID = getStockAccountSplit().getAccount().getCmdtyCurrID();
-			GnuCashCommodity cmdty = getGnuCashFile().getCommodityByQualifID(cmdtyID);
-			buffer.append("sec: '" + cmdty.getName() + "', ");
+			GCshSecID secID = (GCshSecID) getStockAccountSplit().getAccount().getCmdtyID();
+			GnuCashCommodity sec = getGnuCashFile().getCommodityByQualifID(secID);
+			buffer.append("sec: '" + sec.getName() + "', ");
 			buffer.append("qty: " + getStockAccountSplit().getQuantityFormatted() + "\n");
 		}
 		catch ( TransactionSplitNotFoundException e )

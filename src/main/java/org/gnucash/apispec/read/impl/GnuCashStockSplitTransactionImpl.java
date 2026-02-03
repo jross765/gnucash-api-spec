@@ -7,8 +7,8 @@ import org.gnucash.api.read.GnuCashTransactionSplit;
 import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.api.read.impl.GnuCashTransactionSplitImpl;
 import org.gnucash.apispec.read.GnuCashStockSplitTransaction;
-import org.gnucash.base.basetypes.complex.GCshCmdtyCurrID;
-import org.gnucash.base.basetypes.complex.GCshCmdtyCurrNameSpace;
+import org.gnucash.base.basetypes.complex.GCshCmdtyID;
+import org.gnucash.base.basetypes.complex.GCshCmdtyNameSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,8 +84,8 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 			throw new IllegalArgumentException("the split's account's type is not " + GnuCashAccount.Type.STOCK);
 		}
 		
-		if ( getSplit().getAccount().getCmdtyCurrID().getType() == GCshCmdtyCurrID.Type.CURRENCY ) {
-			String msg = "Trx ID " + getID() + ": Commodity/currency of first split's account is of type '" + GCshCmdtyCurrNameSpace.CURRENCY + "'";
+		if ( getSplit().getAccount().getCmdtyID().getType() == GCshCmdtyID.Type.CURRENCY ) {
+			String msg = "Trx ID " + getID() + ": Commodity/currency of first split's account is of type '" + GCshCmdtyNameSpace.CURRENCY + "'";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);
 		}

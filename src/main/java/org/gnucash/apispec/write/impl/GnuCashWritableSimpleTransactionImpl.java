@@ -7,7 +7,7 @@ import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
 import org.gnucash.apispec.read.impl.GnuCashSimpleTransactionImpl;
 import org.gnucash.apispec.read.impl.TransactionValidationException;
 import org.gnucash.apispec.write.GnuCashWritableSimpleTransaction;
-import org.gnucash.base.basetypes.complex.GCshCmdtyCurrID;
+import org.gnucash.base.basetypes.complex.GCshCmdtyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,14 +172,14 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
 		
 		// ---
 		
-		if ( getFirstSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
-			String msg = "Trx ID " + getID() + ": Commodity/currency of first split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'";
+		if ( getFirstSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyID.Type.CURRENCY ) {
+			String msg = "Trx ID " + getID() + ": Commodity/currency of first split's account is not of type '" + GCshCmdtyID.Type.CURRENCY + "'";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( getSecondSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyCurrID.Type.CURRENCY ) {
-			String msg = "Trx ID " + getID() + ": Commodity/currency of second split's account is not of type '" + GCshCmdtyCurrID.Type.CURRENCY + "'";
+		if ( getSecondSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyID.Type.CURRENCY ) {
+			String msg = "Trx ID " + getID() + ": Commodity/currency of second split's account is not of type '" + GCshCmdtyID.Type.CURRENCY + "'";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);
 		}

@@ -71,7 +71,7 @@ public class TestGnuCashCurrencyImpl {
 		assertEquals("EUR", curr.getQualifID().getCode());
 		assertEquals("CURRENCY:EUR", curr.getQualifID().toString());
 		assertEquals("CURRENCY:EUR", curr.getQualifID().toStringShort());
-		assertEquals("GCshCmdtyCurrID [type='CURRENCY', nameSpace='CURRENCY', code='EUR']", curr.getQualifID().toStringLong());
+		assertEquals("GCshCmdtyID [type='CURRENCY', nameSpace='CURRENCY', code='EUR']", curr.getQualifID().toStringLong());
 		assertEquals(Currency.getInstance("EUR"), curr.getCurrency());
 		
 		curr = gcshFile.getCurrencyByID(CURR_2_ID);
@@ -80,7 +80,7 @@ public class TestGnuCashCurrencyImpl {
 		assertEquals("USD", curr.getQualifID().getCode());
 		assertEquals("CURRENCY:USD", curr.getQualifID().toString());
 		assertEquals("CURRENCY:USD", curr.getQualifID().toStringShort());
-		assertEquals("GCshCmdtyCurrID [type='CURRENCY', nameSpace='CURRENCY', code='USD']", curr.getQualifID().toStringLong());
+		assertEquals("GCshCmdtyID [type='CURRENCY', nameSpace='CURRENCY', code='USD']", curr.getQualifID().toStringLong());
 		assertEquals(Currency.getInstance("USD"), curr.getCurrency());
 	}
 
@@ -92,7 +92,7 @@ public class TestGnuCashCurrencyImpl {
 		assertEquals("EUR", curr.getQualifID().getCode());
 		assertEquals("CURRENCY:EUR", curr.getQualifID().toString());
 		assertEquals("CURRENCY:EUR", curr.getQualifID().toStringShort());
-		assertEquals("GCshCmdtyCurrID [type='CURRENCY', nameSpace='CURRENCY', code='EUR']", curr.getQualifID().toStringLong());
+		assertEquals("GCshCmdtyID [type='CURRENCY', nameSpace='CURRENCY', code='EUR']", curr.getQualifID().toStringLong());
 		assertEquals(Currency.getInstance("EUR"), curr.getCurrency());
 		
 		curr = gcshFile.getCurrencyByISOCode(CURR_2_ID.getCode());
@@ -101,7 +101,7 @@ public class TestGnuCashCurrencyImpl {
 		assertEquals("USD", curr.getQualifID().getCode());
 		assertEquals("CURRENCY:USD", curr.getQualifID().toString());
 		assertEquals("CURRENCY:USD", curr.getQualifID().toStringShort());
-		assertEquals("GCshCmdtyCurrID [type='CURRENCY', nameSpace='CURRENCY', code='USD']", curr.getQualifID().toStringLong());
+		assertEquals("GCshCmdtyID [type='CURRENCY', nameSpace='CURRENCY', code='USD']", curr.getQualifID().toStringLong());
 		assertEquals(Currency.getInstance("USD"), curr.getCurrency());
 	}
 	

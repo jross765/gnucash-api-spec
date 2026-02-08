@@ -80,7 +80,7 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 			throw new IllegalArgumentException("the split's account's type is not valid");
 		}
 		
-		if ( splt.getAccount().getCmdtyCurrID().getType() != GCshCmdtyID.Type.CURRENCY ) {
+		if ( splt.getAccount().getCmdtyID().getType() != GCshCmdtyID.Type.CURRENCY ) {
 			throw new IllegalArgumentException("the split's account's commodity/currency is not of type " + GCshCmdtyID.Type.CURRENCY);
 		}
 		
@@ -100,19 +100,19 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 		
 		// ---
 		
-		if ( getFirstSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyID.Type.CURRENCY ) {
+		if ( getFirstSplit().getAccount().getCmdtyID().getType() != GCshCmdtyID.Type.CURRENCY ) {
 			String msg = "Trx ID " + getID() + ": Commodity/currency of first split's account is not of type '" + GCshCmdtyID.Type.CURRENCY + "'";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( getSecondSplit().getAccount().getCmdtyCurrID().getType() != GCshCmdtyID.Type.CURRENCY ) {
+		if ( getSecondSplit().getAccount().getCmdtyID().getType() != GCshCmdtyID.Type.CURRENCY ) {
 			String msg = "Trx ID " + getID() + ": Commodity/currency of second split's account is not of type '" + GCshCmdtyID.Type.CURRENCY + "'";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( ! getFirstSplit().getAccount().getCmdtyCurrID().getCode().equals( getSecondSplit().getAccount().getCmdtyCurrID().getCode() ) ) {
+		if ( ! getFirstSplit().getAccount().getCmdtyID().getCode().equals( getSecondSplit().getAccount().getCmdtyCurrID().getCode() ) ) {
 			String msg = "Trx ID " + getID() + ": Commodity/currency code of the two splits are not equal";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);

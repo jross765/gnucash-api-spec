@@ -221,7 +221,7 @@ public class TestGnuCashWritableSecurityImpl {
 
 		assertEquals(ConstTest.Stats.NOF_SEC + 1, gcshInFile.getSecurities().size());
 
-		GnuCashCommodity cmdty = gcshOutFile.getCommodityByQualifID(newID);
+		GnuCashCommodity cmdty = gcshOutFile.getCommodityByID(newID);
 		assertNotEquals(null, cmdty);
 
 		assertEquals(newID.toString(), cmdty.getQualifID().toString());

@@ -49,7 +49,7 @@ public class GnuCashFileExtImpl extends GnuCashFileImpl
 
 	@Override
 	public GnuCashCurrency getCurrencyByID(final GCshCurrID currID) {
-		return new GnuCashCurrencyImpl( (GnuCashCommodityImpl) getCommodityByQualifID(currID) );
+		return new GnuCashCurrencyImpl( (GnuCashCommodityImpl) getCommodityByID(currID) );
 	}
 
 	@Override
@@ -75,27 +75,27 @@ public class GnuCashFileExtImpl extends GnuCashFileImpl
 
 	@Override
 	public GnuCashSecurity getSecurityByID(final GCshSecID secID) {
-		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByQualifID(secID) );
+		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByID(secID) );
 	}
 
 	@Override
-	public GnuCashSecurity getSecurityByQualifID(final String nameSpace, final String code) {
-		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByQualifID(nameSpace, code) );
+	public GnuCashSecurity getSecurityByNamSpcCode(final String nameSpace, final String code) {
+		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByNamSpcCode(nameSpace, code) );
 	}
 	
 	@Override
-	public GnuCashSecurity getSecurityByQualifID(final GCshCmdtyNameSpace.Exchange exchange, final String code) {
-		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByQualifID(exchange, code) );
+	public GnuCashSecurity getSecurityByNamSpcCode(final GCshCmdtyNameSpace.Exchange exchange, final String code) {
+		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByNamSpcCode(exchange, code) );
 	}
 
 	@Override
-	public GnuCashSecurity getSecurityByQualifID(final GCshCmdtyNameSpace.MIC mic, final String code) {
-		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByQualifID(mic, code) );
+	public GnuCashSecurity getSecurityByNamSpcCode(final GCshCmdtyNameSpace.MIC mic, final String code) {
+		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByNamSpcCode(mic, code) );
 	}
 
 	@Override
-	public GnuCashSecurity getSecurityByQualifID(final GCshCmdtyNameSpace.SecIdType secIdType, final String code) {
-		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByQualifID(secIdType, code) );
+	public GnuCashSecurity getSecurityByNamSpcCode(final GCshCmdtyNameSpace.SecIdType secIdType, final String code) {
+		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByNamSpcCode(secIdType, code) );
 	}
 
 	@Override

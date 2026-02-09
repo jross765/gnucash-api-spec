@@ -23,13 +23,13 @@ public interface GnuCashFileExt extends GnuCashFile
 	
 	GnuCashSecurity getSecurityByID(GCshSecID secID);
 
-	GnuCashSecurity getSecurityByQualifID(String nameSpace, String code);
+	GnuCashSecurity getSecurityByNamSpcCode(String nameSpace, String code);
 	
-	GnuCashSecurity getSecurityByQualifID(GCshCmdtyNameSpace.Exchange exchange, String code);
+	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.Exchange exchange, String code);
 
-	GnuCashSecurity getSecurityByQualifID(GCshCmdtyNameSpace.MIC mic, String code);
+	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.MIC mic, String code);
 
-	GnuCashSecurity getSecurityByQualifID(GCshCmdtyNameSpace.SecIdType secIdType, String code);
+	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.SecIdType secIdType, String code);
 
 	GnuCashSecurity getSecurityByXCode(String xCode);
 

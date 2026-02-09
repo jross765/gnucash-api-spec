@@ -108,7 +108,7 @@ public class TestGnuCashSecurityImpl {
 
 	@Test
 	public void test01_1() throws Exception {
-		sec = gcshFile.getSecurityByQualifID(SEC_1_EXCH, SEC_1_ID);
+		sec = gcshFile.getSecurityByNamSpcCode(SEC_1_EXCH, SEC_1_ID);
 		assertNotEquals(null, sec);
 
 		assertEquals(secID1.toString(), sec.getQualifID().toString());
@@ -187,7 +187,7 @@ public class TestGnuCashSecurityImpl {
 
 	@Test
 	public void test02_1() throws Exception {
-		sec = gcshFile.getSecurityByQualifID(SEC_3_SECIDTYPE.toString(), SEC_3_ID);
+		sec = gcshFile.getSecurityByNamSpcCode(SEC_3_SECIDTYPE.toString(), SEC_3_ID);
 		assertNotEquals(null, sec);
 
 		assertEquals(secID3.toString(), sec.getQualifID().toString());

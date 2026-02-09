@@ -626,7 +626,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 			buffer.append("ID: " + getStockAccountSplit().getID() + ", ");
 			buffer.append("acct: " + getStockAccountSplit().getAccount().getQualifiedName() + ", ");
 			GCshSecID secID = (GCshSecID) getStockAccountSplit().getAccount().getCmdtyID();
-			GnuCashCommodity sec = getGnuCashFile().getCommodityByQualifID(secID);
+			GnuCashCommodity sec = getGnuCashFile().getCommodityByID(secID);
 			buffer.append("cmdty: '" + sec.getName() + "', ");
 			buffer.append("no. of shares: " + getStockAccountSplit().getQuantityFormatted() + "\n");
 		}

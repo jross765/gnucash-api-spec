@@ -222,7 +222,7 @@ public class TestGnuCashWritableSimpleTransactionImpl {
 		assertNotEquals(null, specTrxRO);
 		assertEquals(TRX_4_ID, specTrxRO.getID());
 
-		GnuCashWritableSimpleTransaction specTrxRW = new GnuCashWritableSimpleTransactionImpl((GnuCashSimpleTransactionImpl) specTrxRO);
+		GnuCashWritableSimpleTransaction specTrxRW = new GnuCashWritableSimpleTransactionImpl(specTrxRO);
 		assertNotEquals(null, specTrxRW);
 		assertEquals(TRX_4_ID, specTrxRW.getID());
 		

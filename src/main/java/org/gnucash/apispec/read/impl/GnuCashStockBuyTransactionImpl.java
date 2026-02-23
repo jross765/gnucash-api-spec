@@ -300,7 +300,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 			throw new TransactionValidationException(msg);
 		}
 		if ( ! splt.getQuantity().equals( splt.getValue() ) ) {
-			String msg = "the split's quantity is not equal to ist value";
+			String msg = "the split's quantity is not equal to its value";
 			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}
@@ -338,7 +338,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 		}
 		
 		if ( ! splt.getQuantity().equals( splt.getValue() ) ) {
-			String msg = "the split's quantity is not equal to ist value";
+			String msg = "the split's quantity is not equal to its value";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}

@@ -10,7 +10,10 @@ import org.gnucash.api.write.GnuCashWritableTransactionSplit;
 import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
 import org.gnucash.apispec.read.impl.GnuCashSimpleTransactionImpl;
 import org.gnucash.apispec.read.impl.GnuCashStockBuyTransactionImpl;
+import org.gnucash.apispec.read.impl.GnuCashStockBuyTransactionImpl.SplitAccountType;
+import org.gnucash.apispec.read.impl.TransactionValidationException;
 import org.gnucash.apispec.write.GnuCashWritableStockBuyTransaction;
+import org.gnucash.base.basetypes.complex.GCshCmdtyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +45,10 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
     private static final int NOF_SPLITS_MAX = NOF_SPLITS_STOCK + NOF_SPLITS_FEES_TAXES_MAX + NOF_SPLITS_OFFSETTING;
 
 	// ---------------------------------------------------------------
+    
+    private int[] splitCounter;
+
+	// ---------------------------------------------------------------
 
     /**
      * Create a new Transaction and add it to the file.
@@ -50,6 +57,16 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
      */
     public GnuCashWritableStockBuyTransactionImpl(final GnuCashStockBuyTransactionImpl trx) {
     	super(trx);
+    	
+    	init();
+    	
+		try {
+			validate();
+		} catch ( TransactionValidationException exc ) {
+			throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-buy transaction");
+		} catch ( Exception exc ) {
+			throw new IllegalArgumentException("argument <trx>: something went wrong");
+		}
     }
 
     /**
@@ -59,9 +76,48 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
      */
     public GnuCashWritableStockBuyTransactionImpl(final GnuCashWritableStockBuyTransaction trx) {
     	super(trx);
+    	
+    	init();
+    	
+		try {
+			validate();
+		} catch ( TransactionValidationException exc ) {
+			throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-buy transaction");
+		} catch ( Exception exc ) {
+			throw new IllegalArgumentException("argument <trx>: something went wrong");
+		}
     }
 
     // ---------------------------------------------------------------
+    
+    // ::TODO: Redundant to GnuCashStockBuyTransactionImpl.init()
+    protected void init() {
+	    splitCounter = new int[SplitAccountType.values().length];
+	    
+	    for ( SplitAccountType type : SplitAccountType.values() ) {
+	    	splitCounter[type.ordinal()] = 0;
+	    }
+	    
+	    try
+		{
+			if ( getStockAccountSplit() != null ) {
+				splitCounter[SplitAccountType.STOCK.ordinal()] = 1;
+			}
+			
+		    if ( getExpensesSplits().size() != 0 ) {
+		    	splitCounter[SplitAccountType.TAXES_FEES.ordinal()] = getExpensesSplits().size();
+		    }
+
+		    if ( getOffsettingAccountSplit() != null ) {
+		    	splitCounter[SplitAccountType.OFFSETTING.ordinal()] = 1;
+		    }
+		}
+		catch ( TransactionSplitNotFoundException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
     
 	@Override
 	public GnuCashWritableTransactionSplit getWritableStockAccountSplit() throws TransactionSplitNotFoundException {
@@ -315,14 +371,173 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 		getWritableOffsettingAccountSplit().setValue(amtNeg);
 	}
 
-    // ---------------------------------------------------------------
-    
+	// ---------------------------------------------------------------
+	
 	@Override
-	public void validate() throws Exception {
-		// ::TODO
-	}
+    // ::TODO: Redundant to GnuCashStockBuyTransactionImpl.validate()
+	// (as well as the following helper functions)
+	public void validate() throws Exception
+	{
+		if ( getSplitsCount() < NOF_SPLITS_MIN ) {
+			String msg = "Trx ID " + getID() + ": Number of splits (altogether) is < " + NOF_SPLITS_MIN;
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( getSplitsCount() > NOF_SPLITS_MAX ) {
+			String msg = "Trx ID " + getID() + ": Number of splits (altogether) is > " + NOF_SPLITS_MAX;
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splitCounter[SplitAccountType.STOCK.ordinal()] != NOF_SPLITS_STOCK ) {
+			String msg = "Trx ID " + getID() + ": Number of splits to stock account is not " + NOF_SPLITS_STOCK;
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splitCounter[SplitAccountType.TAXES_FEES.ordinal()] < NOF_SPLITS_FEES_TAXES_MIN || 
+			 splitCounter[SplitAccountType.TAXES_FEES.ordinal()] > NOF_SPLITS_FEES_TAXES_MAX ) {
+			String msg = "Trx ID " + getID() + ": Number of splits to expenses account is not between " + NOF_SPLITS_FEES_TAXES_MIN + " and " + NOF_SPLITS_FEES_TAXES_MAX;
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splitCounter[SplitAccountType.OFFSETTING.ordinal()] != NOF_SPLITS_OFFSETTING ) {
+			String msg = "Trx ID " + getID() + ": Number of splits to offsetting account is not " + NOF_SPLITS_OFFSETTING;
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		// ---
+		
+		validateStockAcctSplit( getStockAccountSplit() );
+		
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			validateTaxesFeesAcctSplit( splt );
+		}
+		
+		validateOffsettingAcctSplit( getOffsettingAccountSplit() );
 
-    // ---------------------------------------------------------------
+		// ---
+		
+		if ( getBalance().doubleValue() != 0.0 ) {
+			String msg = "Trx ID :" + getID() + ": Transaction is not balanced: " + getBalance();
+			LOGGER.error("validate: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+	}
+	
+	// ----------------------------
+	
+	private void validateStockAcctSplit(final GnuCashTransactionSplit splt) throws TransactionValidationException {
+		if ( splt.getAction() != GnuCashTransactionSplit.Action.BUY ) {
+			String msg = "the split's action is not valid";
+			LOGGER.error("validateStockAcctSplit: " + msg);
+			throw new TransactionValidationException("msg");
+		}
+		
+		if ( splt.getAccount().getType() != GnuCashAccount.Type.STOCK ) {
+			String msg = "the split's account's type is not valid";
+			LOGGER.error("validateStockAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getAccount().getCmdtyID().getType() == GCshCmdtyID.Type.CURRENCY ) {
+			String msg = "the split's account's security/currency is not valid";
+			LOGGER.error("validateStockAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getQuantity().doubleValue() <= 0.0 ) {
+			String msg = "the split's quantity is not valid";
+			LOGGER.error("validateStockAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getValue().doubleValue() <= 0.0 ) {
+			String msg = "the split's value is not valid";
+			LOGGER.error("validateStockAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+	}
+	
+	private void validateTaxesFeesAcctSplit(final GnuCashTransactionSplit splt) throws TransactionValidationException {
+		if ( splt.getAction() != null ) { // null is valid!
+			String msg = "the split's action is not valid";
+			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getAccount().getType() != GnuCashAccount.Type.EXPENSE ) {
+			String msg = "the split's account's type is not valid";
+			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getAccount().getCmdtyID().getType() != GCshCmdtyID.Type.CURRENCY ) {
+			String msg = "the split's account's security/currency is not valid";
+			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getQuantity().doubleValue() <= 0.0 ) {
+			String msg = "the split's quantity is not valid";
+			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getValue().doubleValue() <= 0.0 ) {
+			String msg = "the split's value is not valid";
+			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		if ( ! splt.getQuantity().equals( splt.getValue() ) ) {
+			String msg = "the split's quantity is not equal to its value";
+			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+	}
+	
+	private void validateOffsettingAcctSplit(final GnuCashTransactionSplit splt) throws TransactionValidationException {
+		if ( splt.getAction() != null ) { // null is valid!
+			String msg = "the split's action is not valid";
+			LOGGER.error("validateOffsettingAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getAccount().getType() != GnuCashAccount.Type.BANK ) {
+			String msg = "the split's account's type is not valid";
+			LOGGER.error("validateOffsettingAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getAccount().getCmdtyID().getType() != GCshCmdtyID.Type.CURRENCY ) {
+			String msg = "the split's account's security/currency is not valid";
+			LOGGER.error("validateOffsettingAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getQuantity().doubleValue() >= 0.0 ) {
+			String msg = "the split's quantity is not valid";
+			LOGGER.error("validateOffsettingAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( splt.getValue().doubleValue() >= 0.0 ) {
+			String msg = "the split's value is not valid";
+			LOGGER.error("validateOffsettingAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+		
+		if ( ! splt.getQuantity().equals( splt.getValue() ) ) {
+			String msg = "the split's quantity is not equal to its value";
+			LOGGER.error("validateOffsettingAcctSplit: " + msg);
+			throw new TransactionValidationException(msg);
+		}
+	}
+	
+	// ---------------------------------------------------------------
     
     @Override
     public String toString() {

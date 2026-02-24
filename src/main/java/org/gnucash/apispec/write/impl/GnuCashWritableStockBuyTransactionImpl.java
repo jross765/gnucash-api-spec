@@ -28,7 +28,7 @@ import xyz.schnorxoborx.base.numbers.FixedPointNumber;
 public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTransactionImpl 
                                                     implements GnuCashWritableStockBuyTransaction
 {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GnuCashWritableStockBuyTransaction.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GnuCashWritableStockBuyTransactionImpl.class);
 
 	// ---------------------------------------------------------------
     

@@ -25,7 +25,7 @@ import xyz.schnorxoborx.base.numbers.FixedPointNumber;
  * @see GnuCashTransaction
  */
 public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
-										     implements GnuCashStockBuyTransaction
+										    implements GnuCashStockBuyTransaction
 {
 	public enum SplitAccountType {
 		STOCK,

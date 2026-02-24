@@ -1,4 +1,4 @@
-package org.gnucash.apispec.read.impl;
+package org.gnucash.apispec.write.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,11 +6,13 @@ import java.util.List;
 import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashAccount;
 import org.gnucash.api.read.GnuCashCommodity;
-import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.GnuCashTransactionSplit;
-import org.gnucash.api.read.impl.GnuCashTransactionImpl;
-import org.gnucash.api.read.impl.GnuCashTransactionSplitImpl;
-import org.gnucash.apispec.read.GnuCashStockDividendTransaction;
+import org.gnucash.api.write.GnuCashWritableTransactionSplit;
+import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
+import org.gnucash.apispec.read.impl.GnuCashSimpleTransactionImpl;
+import org.gnucash.apispec.read.impl.GnuCashStockDividendTransactionImpl;
+import org.gnucash.apispec.read.impl.TransactionValidationException;
+import org.gnucash.apispec.write.GnuCashWritableStockDividendTransaction;
 import org.gnucash.base.basetypes.complex.GCshCmdtyID;
 import org.gnucash.base.basetypes.complex.GCshSecID;
 import org.slf4j.Logger;
@@ -20,12 +22,12 @@ import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
 import xyz.schnorxoborx.base.numbers.FixedPointNumber;
 
 /**
- * xyz
+ * xyz.
  * 
- * @see GnuCashTransaction
+ * @see GnuCashSimpleTransactionImpl
  */
-public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
-										         implements GnuCashStockDividendTransaction
+public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritableTransactionImpl 
+                                                         implements GnuCashWritableStockDividendTransaction
 {
 	public enum SplitAccountType {
 		STOCK,
@@ -34,7 +36,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 		OFFSETTING
 	}
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(GnuCashStockDividendTransactionImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GnuCashWritableStockDividendTransactionImpl.class);
 
 	// ---------------------------------------------------------------
     
@@ -58,11 +60,16 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 
 	// ---------------------------------------------------------------
 
-	public GnuCashStockDividendTransactionImpl(GnuCashTransactionImpl trx) {
-		super(trx);
-		
-		init();
-		
+    /**
+     * Create a new Transaction and add it to the file.
+     *
+     * @param trx the file we belong to
+     */
+    public GnuCashWritableStockDividendTransactionImpl(final GnuCashStockDividendTransactionImpl trx) {
+    	super(trx);
+    	
+    	init();
+    	
 		try {
 			validate();
 		} catch ( TransactionValidationException exc ) {
@@ -70,11 +77,31 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 		} catch ( Exception exc ) {
 			throw new IllegalArgumentException("argument <trx>: something went wrong");
 		}
-	}
+    }
 
-	// ---------------------------------------------------------------
-	
-	private void init() {
+    /**
+     * Create a new Transaction and add it to the file.
+     *
+     * @param trx the file we belong to
+     */
+    public GnuCashWritableStockDividendTransactionImpl(final GnuCashWritableStockDividendTransaction trx) {
+    	super(trx);
+    	
+    	init();
+    	
+		try {
+			validate();
+		} catch ( TransactionValidationException exc ) {
+			throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-dividend transaction");
+		} catch ( Exception exc ) {
+			throw new IllegalArgumentException("argument <trx>: something went wrong");
+		}
+    }
+
+    // ---------------------------------------------------------------
+    
+    // ::TODO: Redundant to GnuCashStockBuyTransactionImpl.init()
+    protected void init() {
 	    splitCounter = new int[SplitAccountType.values().length];
 	    
 	    for ( SplitAccountType type : SplitAccountType.values() ) {
@@ -100,105 +127,242 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	// ---------------------------------------------------------------
-
-	// ::TODO / ::CHECK: Really necessary? Or rather dead code?
+    }
+    
 	@Override
-	protected void addSplit(GnuCashTransactionSplitImpl splt) {
-		if ( getSplitsCount() >= NOF_SPLITS_MAX ) {
-			throw new IllegalStateException("This transaction already has the maximum number of splits");
-		}
-		
-		if ( splt.getAccount().getType() == GnuCashAccount.Type.STOCK ) {
-			try {
-				validateStockAcctSplit(splt);
-			} catch ( TransactionValidationException exc ) {
-				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a dividend transaction");
-			} catch ( Exception exc ) {
-				throw new IllegalArgumentException("argument <trx>: something went wrong");
-			}
-		} else if ( splt.getAccount().getType() == GnuCashAccount.Type.EXPENSE ) {
-			try {
-				validateTaxesFeesAcctSplit(splt);
-			} catch ( TransactionValidationException exc ) {
-				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a dividend transaction");
-			} catch ( Exception exc ) {
-				throw new IllegalArgumentException("argument <trx>: something went wrong");
-			}
-		} else if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ) {
-			try {
-				validateOffsettingAcctSplit(splt);
-			} catch ( TransactionValidationException exc ) {
-				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a dividend transaction");
-			} catch ( Exception exc ) {
-				throw new IllegalArgumentException("argument <trx>: something went wrong");
-			}
-		}
-		
-		super.addSplit(splt);
+	public GnuCashWritableTransactionSplit getWritableStockAccountSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
+    	return (GnuCashWritableTransactionSplit) getStockAccountSplit();
 	}
 
-	public void addSplit(final SplitAccountType type, final GnuCashTransactionSplitImpl splt) throws TransactionValidationException {
-		if ( type == SplitAccountType.STOCK ) {
-			addStockAcctSplit(splt);
-		} else if ( type == SplitAccountType.INCOME ) {
-			addIncomeAcctSplit(splt);
-		} else if ( type == SplitAccountType.TAXES_FEES ) {
-			addTaxesFeesAcctSplit(splt);
-		} else if ( type == SplitAccountType.OFFSETTING ) {
-			addOffsettingAcctSplit(splt);
-		} 
-	}
+	@Override
+	public GnuCashWritableTransactionSplit getWritableIncomeAccountSplit() throws TransactionSplitNotFoundException
+	{
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
 	
-	private void addStockAcctSplit(final GnuCashTransactionSplitImpl splt) throws TransactionValidationException {
-		if ( splitCounter[SplitAccountType.STOCK.ordinal()] > 0 ) {
-			throw new IllegalStateException("Stock account split already set");
-		}
-		
-		validateStockAcctSplit( splt );
-		
-		super.addSplit(splt);
-		splitCounter[SplitAccountType.STOCK.ordinal()]++;
+    	return (GnuCashWritableTransactionSplit) getIncomeAccountSplit();
 	}
-	
-	private void addIncomeAcctSplit(final GnuCashTransactionSplitImpl splt) throws TransactionValidationException {
-		if ( splitCounter[SplitAccountType.INCOME.ordinal()] > 0 ) {
-			throw new IllegalStateException("Income account split already set");
-		}
-		
-		validateIncomeAcctSplit( splt );
-		
-		super.addSplit(splt);
-		splitCounter[SplitAccountType.INCOME.ordinal()]++;
-	}
-	
-	private void addTaxesFeesAcctSplit(final GnuCashTransactionSplitImpl splt) throws TransactionValidationException {
-		if ( splitCounter[SplitAccountType.TAXES_FEES.ordinal()] > 0 /* ::TODO */ ) {
-			throw new IllegalStateException("Taxes/fees account split already set");
-		}
 
-		validateTaxesFeesAcctSplit( splt );
-		
-		super.addSplit(splt);
-		splitCounter[SplitAccountType.TAXES_FEES.ordinal()]++;
-	}
+	@Override
+	public List<GnuCashWritableTransactionSplit> getWritableExpensesSplits() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
 	
-	private void addOffsettingAcctSplit(final GnuCashTransactionSplitImpl splt) throws TransactionValidationException {
-		if ( splitCounter[SplitAccountType.OFFSETTING.ordinal()] > 0 ) {
-			throw new IllegalStateException("Offsetting account split already set");
+    	List<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
+    	
+    	for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+    		result.add( (GnuCashWritableTransactionSplit) splt );
+    	}
+    	
+    	return result;
+	}
+
+	@Override
+	public GnuCashWritableTransactionSplit getWritableOffsettingAccountSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
+    	return (GnuCashWritableTransactionSplit) getOffsettingAccountSplit();
+	}
+
+    // ---------------------------------------------------------------
+    
+	@Override
+	public GnuCashTransactionSplit getStockAccountSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
+		for ( GnuCashTransactionSplit splt : getSplits() ) {
+			if ( splt.getAccount().getType() == GnuCashAccount.Type.STOCK ) {
+				return splt;
+			}
 		}
 		
-		validateOffsettingAcctSplit( splt );
-		
-		super.addSplit(splt);
-		splitCounter[SplitAccountType.OFFSETTING.ordinal()]++;
+		return null;
 	}
+
+	@Override
+	public GnuCashTransactionSplit getIncomeAccountSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
 	
+		for ( GnuCashTransactionSplit splt : getSplits() ) {
+			if ( splt.getAccount().getType() == GnuCashAccount.Type.INCOME ) {
+				return splt;
+			}
+		}
+		
+		return null;
+	}
+
+	@Override
+	public List<GnuCashTransactionSplit> getExpensesSplits() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
+		List<GnuCashTransactionSplit> result = new ArrayList<GnuCashTransactionSplit>();
+		
+		for ( GnuCashTransactionSplit splt : getSplits() ) {
+			if ( splt.getAccount().getType() == GnuCashAccount.Type.EXPENSE ) {
+				result.add(splt);
+			}
+		}
+		
+		return result;
+	}
+
+	@Override
+	public GnuCashTransactionSplit getOffsettingAccountSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
+		for ( GnuCashTransactionSplit splt : getSplits() ) {
+			if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ) {
+				return splt;
+			}
+		}
+		
+		return null;
+	}
+
+    // ----------------------------
+    
+	@Override
+	public FixedPointNumber getGrossDividend() throws TransactionSplitNotFoundException {
+		return getIncomeAccountSplit().getValue().negate(); // Notice: negate
+	}
+
+	@Override
+	public BigFraction getGrossDividendRat() throws TransactionSplitNotFoundException {
+		return getIncomeAccountSplit().getValueRat().negate(); // Notice: negate
+	}
+
+	@Override
+	public FixedPointNumber getFeesTaxes() throws TransactionSplitNotFoundException {
+		FixedPointNumber result = FixedPointNumber.ZERO.copy(); // Caution: FPN is mutable!
+		
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			result.add( splt.getValue() ); // mutable
+		}
+		
+		return result;
+	}
+
+	@Override
+	public BigFraction getFeesTaxesRat() throws TransactionSplitNotFoundException {
+		BigFraction result = BigFraction.ZERO; // Caution: BF is immutable
+		
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			result = result.add( splt.getValueRat() ); // immutable
+		}
+		
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FixedPointNumber getNetDividend() throws TransactionSplitNotFoundException
+	{
+		FixedPointNumber result = getGrossDividend();
+		
+		result.subtract( getFeesTaxes() ); // mutable
+		
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BigFraction getNetDividendRat() throws TransactionSplitNotFoundException
+	{
+		BigFraction result = getGrossDividendRat();
+		
+		result = result.subtract( getFeesTaxesRat() ); // immutable
+		
+		return result;
+	}
+
+    // ---------------------------------------------------------------
+    
+	@Override
+	public void setGrossDividend(FixedPointNumber amt) throws TransactionSplitNotFoundException {
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		// CAUTION: < 0 is valid (adjustment posting)
+		if ( amt.equals(FixedPointNumber.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is = 0");
+		}
+		
+		FixedPointNumber amtNeg = amt.copy().negate(); // mutable
+		
+		getWritableIncomeAccountSplit().setQuantity(amtNeg);
+		getWritableIncomeAccountSplit().setValue(amtNeg);
+	}
+
+	@Override
+	public void setGrossDividend(BigFraction amt) throws TransactionSplitNotFoundException {
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		// CAUTION: < 0 is valid (adjustment posting)
+		if ( amt.equals(BigFraction.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is = 0");
+		}
+		
+		BigFraction amtNeg = amt.negate(); // mutable
+		
+		getWritableIncomeAccountSplit().setQuantity(amtNeg);
+		getWritableIncomeAccountSplit().setValue(amtNeg);
+	}
+
+	@Override
+	public void setNetDividend(final FixedPointNumber amt) throws TransactionSplitNotFoundException {
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		// CAUTION: < 0 is valid (adjustment posting)
+		if ( amt.equals(FixedPointNumber.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is = 0");
+		}
+		
+		FixedPointNumber amtNeg = amt.copy(); // mutable
+		
+		getWritableOffsettingAccountSplit().setQuantity(amtNeg);
+		getWritableOffsettingAccountSplit().setValue(amtNeg);
+	}
+
+	@Override
+	public void setNetDividend(final BigFraction amt) throws TransactionSplitNotFoundException {
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		// CAUTION: < 0 is valid (adjustment posting)
+		if ( amt.equals(BigFraction.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is = 0");
+		}
+		
+		BigFraction amtNeg = amt.negate(); // immutable
+		
+		getWritableOffsettingAccountSplit().setQuantity(amtNeg);
+		getWritableOffsettingAccountSplit().setValue(amtNeg);
+	}
+
 	// ---------------------------------------------------------------
 	
 	@Override
+    // ::TODO: Redundant to GnuCashStockBuyTransactionImpl.validate()
+	// (as well as the following helper functions)
 	public void validate() throws Exception
 	{
 		if ( getSplitsCount() < NOF_SPLITS_MIN ) {
@@ -398,163 +562,11 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 	}
 	
 	// ---------------------------------------------------------------
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public GnuCashTransactionSplit getStockAccountSplit() throws TransactionSplitNotFoundException
-	{
-    	if ( getSplitsCount() == 0 )
-    		throw new TransactionSplitNotFoundException();
-	
-		for ( GnuCashTransactionSplit splt : getSplits() ) {
-			if ( splt.getAccount().getType() == GnuCashAccount.Type.STOCK ) {
-				return splt;
-			}
-		}
-		
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public GnuCashTransactionSplit getIncomeAccountSplit() throws TransactionSplitNotFoundException
-	{
-    	if ( getSplitsCount() == 0 )
-    		throw new TransactionSplitNotFoundException();
-	
-		for ( GnuCashTransactionSplit splt : getSplits() ) {
-			if ( splt.getAccount().getType() == GnuCashAccount.Type.INCOME ) {
-				return splt;
-			}
-		}
-		
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<GnuCashTransactionSplit> getExpensesSplits() throws TransactionSplitNotFoundException
-	{
-    	if ( getSplitsCount() == 0 )
-    		throw new TransactionSplitNotFoundException();
-	
-		List<GnuCashTransactionSplit> result = new ArrayList<GnuCashTransactionSplit>();
-		
-		for ( GnuCashTransactionSplit splt : getSplits() ) {
-			if ( splt.getAccount().getType() == GnuCashAccount.Type.EXPENSE ) {
-				result.add(splt);
-			}
-		}
-		
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public GnuCashTransactionSplit getOffsettingAccountSplit() throws TransactionSplitNotFoundException
-	{
-    	if ( getSplitsCount() == 0 )
-    		throw new TransactionSplitNotFoundException();
-	
-		for ( GnuCashTransactionSplit splt : getSplits() ) {
-			if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ) {
-				return splt;
-			}
-		}
-		
-		return null;
-	}
-	
-	// ---------------------------------------------------------------
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public FixedPointNumber getGrossDividend() throws TransactionSplitNotFoundException
-	{
-		return getIncomeAccountSplit().getValue().negate();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public BigFraction getGrossDividendRat() throws TransactionSplitNotFoundException
-	{
-		return getIncomeAccountSplit().getValueRat().negate();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public FixedPointNumber getFeesTaxes() throws TransactionSplitNotFoundException
-	{
-		FixedPointNumber result = FixedPointNumber.ZERO.copy(); // Caution: FPN is mutable!
-		
-		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
-			result.add( splt.getValue() ); // mutable
-		}
-		
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public BigFraction getFeesTaxesRat() throws TransactionSplitNotFoundException
-	{
-		BigFraction result = BigFraction.ZERO; // Caution: BF is immutable
-		
-		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
-			result = result.add( splt.getValueRat() ); // immutable
-		}
-		
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public FixedPointNumber getNetDividend() throws TransactionSplitNotFoundException
-	{
-		FixedPointNumber result = getGrossDividend();
-		
-		result.subtract( getFeesTaxes() ); // mutable
-		
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public BigFraction getNetDividendRat() throws TransactionSplitNotFoundException
-	{
-		BigFraction result = getGrossDividendRat();
-		
-		result = result.subtract( getFeesTaxesRat() ); // immutable
-		
-		return result;
-	}
-
-	// ---------------------------------------------------------------
-	
-	@Override
-	public String toString() {
+    
+    @Override
+    public String toString() {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("GnuCashStockDividendTransactionImpl [");
+		buffer.append("GnuCashWritableStockDividendTransactionImpl [");
 
 		buffer.append("id=");
 		buffer.append(getID());
@@ -610,7 +622,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 		buffer.append("]");
 
 		return buffer.toString();
-	}
+    }
 
 	public String toStringHuman() {
 		StringBuffer buffer = new StringBuffer();

@@ -30,10 +30,10 @@ public interface GnuCashWritableStockDividendTransaction extends GnuCashWritable
     
     // ---------------------------------------------------------------
     
-//    void setGrossDividend(FixedPointNumber amt)  throws TransactionSplitNotFoundException;
-//    
-//    void setGrossDividend(BigFraction amt)  throws TransactionSplitNotFoundException;
-//    
+    void setGrossDividend(FixedPointNumber amt)  throws TransactionSplitNotFoundException;
+    
+    void setGrossDividend(BigFraction amt)  throws TransactionSplitNotFoundException;
+    
 //    void setFeesTaxes(FixedPointNumber amt)  throws TransactionSplitNotFoundException;
 //    
 //    void setFeesTaxes(BigFraction amt)  throws TransactionSplitNotFoundException;

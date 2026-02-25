@@ -37,7 +37,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 		try {
 			validate();
 		} catch ( TransactionValidationException exc ) {
-			throw new IllegalArgumentException("argument <trx> does not meet the criteria for a simple transaction");
+			throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-split transaction");
 		} catch ( Exception exc ) {
 			throw new IllegalArgumentException("argument <trx>: something went wrong");
 		}
@@ -54,7 +54,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 		try {
 			validate();
 		} catch ( TransactionValidationException exc ) {
-			throw new IllegalArgumentException("argument <trx> does not meet the criteria for a simple transaction");
+			throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-split transaction");
 		} catch ( Exception exc ) {
 			throw new IllegalArgumentException("argument <trx>: something went wrong");
 		}
@@ -74,7 +74,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 		}
 		
 		// splt.getActionStr() == null is *not* valid here
-		// (as opposed to GnuCashSimpleTransactionImpl),
+		// (as opposed to GnuCashStockSplitTransactionImpl),
 		// but implicitly checked with the following:
 		if ( getSplit().getAction() != GnuCashTransactionSplit.Action.SPLIT ) {
 			throw new IllegalArgumentException("the split's action is not " + GnuCashTransactionSplit.Action.SPLIT);
@@ -110,6 +110,9 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
      */
 	@Override
 	public GnuCashTransactionSplit getSplit() throws TransactionSplitNotFoundException {
+    	if ( getSplitsCount() == 0 )
+    		throw new TransactionSplitNotFoundException();
+	
 		return getSplits().get(0);
 	}
 

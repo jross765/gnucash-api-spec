@@ -184,7 +184,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( ! getFirstSplit().getAccount().getCmdtyID().getCode().equals( getSecondSplit().getAccount().getCmdtyCurrID().getCode() ) ) {
+		if ( ! getFirstSplit().getAccount().getCmdtyID().getCode().equals( getSecondSplit().getAccount().getCmdtyID().getCode() ) ) {
 			String msg = "Trx ID " + getID() + ": Commodity/currency code of the two splits are not equal";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);

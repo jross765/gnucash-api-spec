@@ -15,7 +15,6 @@ import org.gnucash.api.write.GnuCashWritableTransaction;
 import org.gnucash.api.write.impl.GnuCashWritableFileImpl;
 import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
 import org.gnucash.apispec.ConstTest;
-import org.gnucash.apispec.read.GnuCashStockDividendTransaction;
 import org.gnucash.apispec.read.impl.GnuCashStockDividendTransactionImpl;
 import org.gnucash.apispec.read.impl.TestGnuCashStockDividendTransactionImpl;
 import org.gnucash.apispec.write.GnuCashWritableStockDividendTransaction;
@@ -99,7 +98,8 @@ public class TestGnuCashWritableStockDividendTransactionImpl {
 
 		assertEquals(TRX_1_ID, genTrx.getID());
 		
-		GnuCashStockDividendTransaction specTrx = new GnuCashStockDividendTransactionImpl((GnuCashTransactionImpl) genTrx);
+		GnuCashStockDividendTransactionImpl roSpecTrx = new GnuCashStockDividendTransactionImpl((GnuCashTransactionImpl) genTrx);
+		GnuCashWritableStockDividendTransaction specTrx = new GnuCashWritableStockDividendTransactionImpl(roSpecTrx);
 		assertNotEquals(null, specTrx);
 		
 		// ---

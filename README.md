@@ -16,23 +16,26 @@ This module provides specialized entities (classes) that are based on more gener
 ### V. 0.1 &rarr; 0.2
 Introduced:
 
-* `GnuCashStockDividendTransaction`
+* `GnuCash(Writable)StockDividendTransaction`
 
 Improvements:
 
-Added to the real added value of this module's classes: More non-trivial special methods:
+* Added to the real added value of this module's classes: More non-trivial special methods:
+    * `GnuCashSimpleTransaction`: Introduced new special methods: `getAmount()`
+    * `GnuCashStockBuyTransaction`: Introduced new special methods: `getGrossPrice()`, `getNetPrice()`, `getFeesTaxes()`
+    * `GnuCashStockSplitTransaction`: Introduced new special methods: `getNofAddShares()`, `getSplitFactor()`, `getNofSharesBeforeSplit()`, `getNofSharesAfterSplit()`
+       (newly introduced, anyway)
 
-* `GnuCashSimpleTransaction`: Introduced new special methods: `getAmount()`
+* Analogously, for the writable variants of theses classes, introduced according `setXYZ()` methods
 
-* `GnuCashStockBuyTransaction`: Introduced new special methods: `getGrossPrice()`, `getNetPrice()`, `getFeesTaxes()`
+* For all the above-mentioned new methods: The `BigFraction` variant, as well.
 
-* `GnuCashStockSplitTransaction`: Introduced new special methods: `getNofAddShares()`, `getSplitFactor()`, `getNofSharesBeforeSplit()`, `getNofSharesAfterSplit()`
+* For all `GnuCashWritableXYZTransaction` classes: Proper test cases / data.
+  (Now they are all covered)
 
-For all the above-mentioned new methods: The `BigFraction` variant, as well.
-
-* `GnuCashWritableSimpleTransaction`: Now proper implementation and test cases / data.
-
-* Overall: A few minor improvements here and there.
+* Overall: 
+    * Fixed bugs
+    * A few minor improvements here and there.
 
 ### V. 0.1
 New.

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gnucash.api.read.GnuCashCommodity;
+import org.gnucash.api.read.GnuCashFile;
 import org.gnucash.api.read.impl.GnuCashCommodityImpl;
 import org.gnucash.api.read.impl.GnuCashFileImpl;
 import org.gnucash.apispec.read.GnuCashCurrency;
@@ -43,6 +44,10 @@ public class GnuCashFileExtImpl extends GnuCashFileImpl
 
 	public GnuCashFileExtImpl(final InputStream is, final boolean withProgBar) throws IOException {
 		super(is, withProgBar);
+	}
+	
+	public GnuCashFileExtImpl(final GnuCashFile gcshFile) throws IOException {
+		super(gcshFile.getFile());
 	}
 	
 	// ---------------------------------------------------------------

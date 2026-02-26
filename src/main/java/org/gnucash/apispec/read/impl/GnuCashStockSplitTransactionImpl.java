@@ -85,7 +85,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 		}
 		
 		if ( getSplit().getAccount().getCmdtyID().getType() == GCshCmdtyID.Type.CURRENCY ) {
-			String msg = "Trx ID " + getID() + ": Commodity/currency of first split's account is of type '" + GCshCmdtyNameSpace.CURRENCY + "'";
+			String msg = "Trx ID " + getID() + ": Security/currency of first split's account is of type '" + GCshCmdtyNameSpace.CURRENCY + "'";
 			LOGGER.error("validate: " + msg);
 			throw new TransactionValidationException(msg);
 		}

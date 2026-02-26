@@ -309,7 +309,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 		}
 		
 		if ( splt.getQuantity().doubleValue() >= 0.0 ) {
-			String msg = "the split's shares is not valid";
+			String msg = "the split's quantity is not valid";
 			LOGGER.error("validateIncomeAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}
@@ -625,9 +625,9 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 			buffer.append("   o Stock acct split: ");
 			buffer.append("ID: " + getStockAccountSplit().getID() + ", ");
 			buffer.append("acct: " + getStockAccountSplit().getAccount().getQualifiedName() + ", ");
-			GCshSecID secID = (GCshSecID) getStockAccountSplit().getAccount().getCmdtyID();
+			GCshCmdtyID secID = getStockAccountSplit().getAccount().getCmdtyID();
 			GnuCashCommodity sec = getGnuCashFile().getCommodityByID(secID);
-			buffer.append("cmdty: '" + sec.getName() + "', ");
+			buffer.append("sec: '" + sec.getName() + "', ");
 			buffer.append("no. of shares: " + getStockAccountSplit().getQuantityFormatted() + "\n");
 		}
 		catch ( TransactionSplitNotFoundException e )

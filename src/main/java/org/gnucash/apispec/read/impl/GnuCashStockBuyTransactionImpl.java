@@ -12,7 +12,7 @@ import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.api.read.impl.GnuCashTransactionSplitImpl;
 import org.gnucash.apispec.read.GnuCashStockBuyTransaction;
 import org.gnucash.base.basetypes.complex.GCshCmdtyID;
-import org.gnucash.base.basetypes.complex.GCshSecID;
+import org.gnucash.base.basetypes.simple.GCshAcctID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -364,6 +364,17 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 		return null;
 	}
 
+	@Override
+    public GnuCashTransactionSplit getExpensesSplit(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException {
+    	for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+    		if ( splt.getAccountID().equals( expAcctID ) ) {
+    			return splt;
+    		}
+    	}
+    	
+    	throw new TransactionSplitNotFoundException();
+    }
+    
 	/**
 	 * {@inheritDoc}
 	 */
@@ -420,52 +431,108 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 		return getStockAccountSplit().getQuantityRat();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-    @Override
-    public FixedPointNumber getPricePerShare()  throws TransactionSplitNotFoundException {
-		FixedPointNumber result = getNetPrice();
+    // ----------------------------
+    
+	@Override
+	public FixedPointNumber getPricePerShare() throws TransactionSplitNotFoundException {
+		return getPricePerShare_Var1();
+	}
+
+	private FixedPointNumber getPricePerShare_Var1() throws TransactionSplitNotFoundException {
+		FixedPointNumber result = getNetPrice_Var1();
 		
 		result.divide( getNofShares() ); // mutable
 		
 		return result;
-    }
-    
-	/**
-	 * {@inheritDoc}
-	 */
-    @Override
-    public BigFraction getPricePerShareRat()  throws TransactionSplitNotFoundException {
-    	BigFraction result = getNetPriceRat();
+	}
+
+	private FixedPointNumber getPricePerShare_Var2() throws TransactionSplitNotFoundException {
+		FixedPointNumber result = getNetPrice_Var3();
 		
-		result = result.divide( getNofSharesRat() ); // immutable
-		
-		return result;
-    }
-    
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public FixedPointNumber getNetPrice() throws TransactionSplitNotFoundException {
-		FixedPointNumber result = getGrossPrice();
-		
-		result.subtract( getFeesTaxes() ); // mutable
+		result.divide( getNofShares() ); // mutable
 		
 		return result;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public BigFraction getNetPriceRat() throws TransactionSplitNotFoundException {
-		BigFraction result = getGrossPriceRat();
+	public BigFraction getPricePerShareRat() throws TransactionSplitNotFoundException {
+		return getPricePerShareRat_Var1();
+	}
+
+	private BigFraction getPricePerShareRat_Var1() throws TransactionSplitNotFoundException {
+		BigFraction result = getNetPriceRat_Var1();
 		
-		result = result.subtract( getFeesTaxesRat() ); // immutable
+		result = result.divide( getNofSharesRat() ); // immutable
 		
 		return result;
+	}
+
+	private BigFraction getPricePerShareRat_Var2() throws TransactionSplitNotFoundException {
+		BigFraction result = getNetPriceRat_Var3();
+		
+		result = result.divide( getNofSharesRat() ); // immutable
+		
+		return result;
+	}
+
+    // ----------------------------
+    
+	@Override
+	public FixedPointNumber getNetPrice() throws TransactionSplitNotFoundException {
+		return getNetPrice_Var1();
+	}
+
+	private FixedPointNumber getNetPrice_Var1() throws TransactionSplitNotFoundException {
+		return getGrossPrice().subtract( getFeesTaxes() );
+	}
+
+	private FixedPointNumber getNetPrice_Var2() throws TransactionSplitNotFoundException {
+		return getNofShares().multiply( getPricePerShare() );
+	}
+
+	private FixedPointNumber getNetPrice_Var3() throws TransactionSplitNotFoundException {
+		return getStockAccountSplit().getValue();
+	}
+
+	@Override
+	public BigFraction getNetPriceRat() throws TransactionSplitNotFoundException {
+		return getNetPriceRat_Var1();
+	}
+
+	private BigFraction getNetPriceRat_Var1() throws TransactionSplitNotFoundException {
+		return getGrossPriceRat().subtract( getFeesTaxesRat() );
+	}
+
+	private BigFraction getNetPriceRat_Var2() throws TransactionSplitNotFoundException {
+		return getNofSharesRat().multiply( getPricePerShareRat() );
+	}
+
+	private BigFraction getNetPriceRat_Var3() throws TransactionSplitNotFoundException {
+		return getStockAccountSplit().getValueRat();
+	}
+
+    // ----------------------------
+
+	@Override
+	public FixedPointNumber getFeeTax(final GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				return splt.getValue();
+			}
+		}
+		
+		throw new TransactionSplitNotFoundException();
+	}
+
+	@Override
+	public BigFraction getFeeTaxRat(final GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				return splt.getValueRat();
+			}
+		}
+		
+		throw new TransactionSplitNotFoundException();
 	}
 
 	/**
@@ -581,7 +648,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 			buffer.append("   o Stock acct split: ");
 			buffer.append("ID: " + getStockAccountSplit().getID() + ", ");
 			buffer.append("acct: " + getStockAccountSplit().getAccount().getQualifiedName() + ", ");
-			GCshSecID secID = (GCshSecID) getStockAccountSplit().getAccount().getCmdtyID();
+			GCshCmdtyID secID = getStockAccountSplit().getAccount().getCmdtyID();
 			GnuCashCommodity sec = getGnuCashFile().getCommodityByID(secID);
 			buffer.append("sec: '" + sec.getName() + "', ");
 			buffer.append("qty: " + getStockAccountSplit().getQuantityFormatted() + "\n");

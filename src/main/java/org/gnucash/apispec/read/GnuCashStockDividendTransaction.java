@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.numbers.fraction.BigFraction;
 import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.GnuCashTransactionSplit;
+import org.gnucash.base.basetypes.simple.GCshAcctID;
 
 import xyz.schnorxoborx.base.beanbase.TransactionSplitNotFoundException;
 import xyz.schnorxoborx.base.numbers.FixedPointNumber;
@@ -17,6 +18,8 @@ public interface GnuCashStockDividendTransaction extends GnuCashTransaction,
     
     GnuCashTransactionSplit       getIncomeAccountSplit()  throws TransactionSplitNotFoundException;
     
+    GnuCashTransactionSplit       getExpensesSplit(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException;
+    
     List<GnuCashTransactionSplit> getExpensesSplits()  throws TransactionSplitNotFoundException;
     
     GnuCashTransactionSplit       getOffsettingAccountSplit()  throws TransactionSplitNotFoundException;
@@ -26,6 +29,10 @@ public interface GnuCashStockDividendTransaction extends GnuCashTransaction,
     FixedPointNumber getGrossDividend()  throws TransactionSplitNotFoundException;
     
     BigFraction      getGrossDividendRat()  throws TransactionSplitNotFoundException;
+    
+    FixedPointNumber getFeeTax(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException;
+    
+    BigFraction      getFeeTaxRat(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException;
     
     FixedPointNumber getFeesTaxes()  throws TransactionSplitNotFoundException;
     

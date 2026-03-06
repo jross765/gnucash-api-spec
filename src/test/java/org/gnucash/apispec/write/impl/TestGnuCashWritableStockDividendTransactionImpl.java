@@ -12,12 +12,14 @@ import org.gnucash.api.read.impl.GnuCashFileImpl;
 import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.api.read.impl.aux.GCshFileStats;
 import org.gnucash.api.write.GnuCashWritableTransaction;
+import org.gnucash.api.write.GnuCashWritableTransactionSplit;
 import org.gnucash.api.write.impl.GnuCashWritableFileImpl;
 import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
 import org.gnucash.apispec.ConstTest;
 import org.gnucash.apispec.read.impl.GnuCashStockDividendTransactionImpl;
 import org.gnucash.apispec.read.impl.TestGnuCashStockDividendTransactionImpl;
 import org.gnucash.apispec.write.GnuCashWritableStockDividendTransaction;
+import org.gnucash.base.basetypes.simple.GCshAcctID;
 import org.gnucash.base.basetypes.simple.GCshTrxID;
 import org.junit.Before;
 import org.junit.Rule;
@@ -150,6 +152,7 @@ public class TestGnuCashWritableStockDividendTransactionImpl {
 	// can actually be modified -- both in memory and persisted in file.
 
 	@Test
+	// High-level
 	public void test02_1() throws Exception {
 		GnuCashWritableTransaction genTrx = gcshInFile.getWritableTransactionByID(TRX_1_ID);
 		assertNotEquals(null, genTrx);
@@ -166,7 +169,7 @@ public class TestGnuCashWritableStockDividendTransactionImpl {
 		// ----------------------------
 		// Modify the object
 
-		specTrxRW.setNetDividend(new FixedPointNumber("9.00"));
+		specTrxRW.setGrossDividend(new FixedPointNumber("11.93"));
 		
 		try {
 			specTrxRW.validate();
@@ -175,8 +178,9 @@ public class TestGnuCashWritableStockDividendTransactionImpl {
 			assertEquals(0, 0); // <-- trx is not balanced
 		}
 		
-		// Correct gross amount:
-		specTrxRW.setGrossDividend(new FixedPointNumber("11.93"));
+		// Either of both:
+		// specTrxRW.setNetDividend(new FixedPointNumber("9.00"));
+		specTrxRW.refreshNetDividend();
 		
 		try {
 			specTrxRW.validate();
@@ -204,6 +208,139 @@ public class TestGnuCashWritableStockDividendTransactionImpl {
 		gcshInFile.writeFile(outFile);
 
 		test02_1_check_persisted(outFile);
+	}
+
+	@Test
+	// Mid-level: Just like test01_1, but "manually"
+	public void test02_2() throws Exception {
+		GnuCashWritableTransaction genTrx = gcshInFile.getWritableTransactionByID(TRX_1_ID);
+		assertNotEquals(null, genTrx);
+		assertEquals(TRX_1_ID, genTrx.getID());
+		
+		GnuCashStockDividendTransactionImpl specTrxRO = new GnuCashStockDividendTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
+		assertNotEquals(null, specTrxRO);
+		assertEquals(TRX_1_ID, specTrxRO.getID());
+
+		GnuCashWritableStockDividendTransaction specTrxRW = new GnuCashWritableStockDividendTransactionImpl(specTrxRO);
+		assertNotEquals(null, specTrxRW);
+		assertEquals(TRX_1_ID, specTrxRW.getID());
+		
+		// ----------------------------
+		// Modify the object
+
+		specTrxRW.setGrossDividend(new FixedPointNumber("11.93"));
+		
+		try {
+			specTrxRW.validate();
+			assertEquals(0, 1);
+		} catch ( Exception ext ) {
+			assertEquals(0, 0); // <-- trx is not balanced
+		}
+		
+		// Correct net amount:
+		specTrxRW.setNetDividend(new FixedPointNumber("9.00"));
+		
+		try {
+			specTrxRW.validate();
+			assertEquals(0, 0); // <-- now everything's OK
+		} catch ( Exception ext ) {
+			assertEquals(0, 1);
+		}
+		
+		// ----------------------------
+		// Check whether the object can has actually be modified
+		// (in memory, not in the file yet).
+
+		test02_1_check_memory(specTrxRW);
+
+		// ----------------------------
+		// Now, check whether the modified object can be written to the
+		// output file, then re-read from it, and whether is is what
+		// we expect it is.
+
+		File outFile = folder.newFile(ConstTest.GCSH_FILENAME_OUT);
+		// System.err.println("Outfile for TestGnuCashWritableCustomerImpl.test01_1: '"
+		// + outFile.getPath() + "'");
+		outFile.delete(); // sic, the temp. file is already generated (empty),
+		// and the GnuCash file writer does not like that.
+		gcshInFile.writeFile(outFile);
+
+		test02_1_check_persisted(outFile);
+	}
+
+	@Test
+	// High-level: like test02_1, but one more twist
+	public void test02_3() throws Exception {
+		GnuCashWritableTransaction genTrx = gcshInFile.getWritableTransactionByID(TRX_1_ID);
+		assertNotEquals(null, genTrx);
+		assertEquals(TRX_1_ID, genTrx.getID());
+		
+		GnuCashStockDividendTransactionImpl specTrxRO = new GnuCashStockDividendTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
+		assertNotEquals(null, specTrxRO);
+		assertEquals(TRX_1_ID, specTrxRO.getID());
+
+		GnuCashWritableStockDividendTransaction specTrxRW = new GnuCashWritableStockDividendTransactionImpl(specTrxRO);
+		assertNotEquals(null, specTrxRW);
+		assertEquals(TRX_1_ID, specTrxRW.getID());
+		
+		// ----------------------------
+		// Modify the object
+
+		specTrxRW.setGrossDividend(new FixedPointNumber("11.93"));
+		
+		try {
+			specTrxRW.validate();
+			assertEquals(0, 1);
+		} catch ( Exception ext ) {
+			assertEquals(0, 0); // <-- trx is not balanced
+		}
+		
+		// Either of both:
+		// specTrxRW.setNetDividend(new FixedPointNumber("9.00"));
+		specTrxRW.refreshNetDividend();
+		
+		try {
+			specTrxRW.validate();
+			assertEquals(0, 0); // <-- now everything's OK
+		} catch ( Exception ext ) {
+			assertEquals(0, 1);
+		}
+		
+		// The twist: Add third fee/tax entry
+		FixedPointNumber newFeeVal = new FixedPointNumber("1.25");
+		specTrxRW.addFeeTax( new GCshAcctID("dce93b2f38df47ceb6ae343a9d16f73b"), newFeeVal ); // Root Account:Aufwendungen:Steuern:Sonstige
+		
+		// Diminish the first fee/tax entry, so the the trx's balance does not change
+		GnuCashWritableTransactionSplit expSpltRW = specTrxRW.getWritableExpensesSplit( new GCshAcctID("2a195872e24048a0a6228107ca8b6a52") ); // Root Account:Aufwendungen:Steuern:Kapitalertrag
+		expSpltRW.setValue( expSpltRW.getValue().subtract(newFeeVal) );
+		expSpltRW.setQuantity( expSpltRW.getQuantity().subtract(newFeeVal) );
+		
+		try {
+			specTrxRW.validate();
+			assertEquals(0, 0); // <-- now everything's OK
+		} catch ( Exception ext ) {
+			assertEquals(0, 1);
+		}
+		
+		// ----------------------------
+		// Check whether the object can has actually be modified
+		// (in memory, not in the file yet).
+
+		test02_3_check_memory(specTrxRW);
+
+		// ----------------------------
+		// Now, check whether the modified object can be written to the
+		// output file, then re-read from it, and whether is is what
+		// we expect it is.
+
+		File outFile = folder.newFile(ConstTest.GCSH_FILENAME_OUT);
+		// System.err.println("Outfile for TestGnuCashWritableCustomerImpl.test01_1: '"
+		// + outFile.getPath() + "'");
+		outFile.delete(); // sic, the temp. file is already generated (empty),
+		// and the GnuCash file writer does not like that.
+		gcshInFile.writeFile(outFile);
+
+		test02_3_check_persisted(outFile);
 	}
 
 	// ---------------------------------------------------------------
@@ -267,6 +404,87 @@ public class TestGnuCashWritableStockDividendTransactionImpl {
 		assertEquals(specTrxRO.getSplits().get(2).toString(), specTrxRO.getExpensesSplits().get(0).toString());
 		assertEquals(specTrxRO.getSplits().get(3).toString(), specTrxRO.getExpensesSplits().get(1).toString());
 		assertEquals(specTrxRO.getSplits().get(4).toString(), specTrxRO.getIncomeAccountSplit().toString());
+		
+		// ---
+		
+		assertEquals(11.93, specTrxRO.getGrossDividend().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(2.93,  specTrxRO.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(9.00,  specTrxRO.getNetDividend().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		
+		assertEquals(BigFraction.of(1193, 100), specTrxRO.getGrossDividendRat()); // changed
+		assertEquals(BigFraction.of(293, 100),  specTrxRO.getFeesTaxesRat());
+		assertEquals(BigFraction.of(9, 1),      specTrxRO.getNetDividendRat()); // changed
+		
+		assertEquals(specTrxRO.getGrossDividendRat().doubleValue(), specTrxRO.getGrossDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrxRO.getFeesTaxesRat().doubleValue(),     specTrxRO.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(specTrxRO.getNetDividendRat().doubleValue(),   specTrxRO.getNetDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
+	}
+
+	// ----------------------------
+
+	private void test02_3_check_memory(GnuCashWritableStockDividendTransaction trx) throws Exception {
+		assertEquals(6, trx.getSplitsCount());
+		
+		assertEquals("ea08a144322146cea38b39d134ca6fc1", trx.getStockAccountSplit().getID().toString());
+		assertEquals("5c5fa881869843d090a932f8e6b15af2", trx.getIncomeAccountSplit().getID().toString());
+		assertEquals(3, trx.getExpensesSplits().size());
+		assertEquals("1fd25550fb63498999ed85a7e935a0e3", trx.getExpensesSplits().get(0).getID().toString());
+		assertEquals("c99e8b5e6b5f410a8ff4fc188480e548", trx.getExpensesSplits().get(1).getID().toString());
+		assertEquals("dce93b2f38df47ceb6ae343a9d16f73b", trx.getExpensesSplits().get(2).getAccountID().toString()); // new; CAUTION: not ID (unpredictable), but ACCOUNT'S ID
+		assertEquals("7abf90fe15124254ac3eb7ec33f798e7", trx.getOffsettingAccountSplit().getID().toString());
+		
+		assertEquals(trx.getSplits().get(0).toString(), trx.getOffsettingAccountSplit().toString());
+		assertEquals(trx.getSplits().get(1).toString(), trx.getStockAccountSplit().toString());
+		assertEquals(trx.getSplits().get(2).toString(), trx.getExpensesSplits().get(0).toString());
+		assertEquals(trx.getSplits().get(3).toString(), trx.getExpensesSplits().get(1).toString());
+		assertEquals(trx.getSplits().get(4).toString(), trx.getIncomeAccountSplit().toString());
+		assertEquals(trx.getSplits().get(5).toString(), trx.getExpensesSplits().get(2).toString());
+		
+		// ---
+		
+		assertEquals(11.93, trx.getGrossDividend().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		assertEquals(2.93,  trx.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(9.00,  trx.getNetDividend().doubleValue(), ConstTest.DIFF_TOLERANCE); // changed
+		
+		assertEquals(BigFraction.of(1193, 100), trx.getGrossDividendRat()); // changed
+		assertEquals(BigFraction.of(293, 100),  trx.getFeesTaxesRat());
+		assertEquals(BigFraction.of(9, 1),      trx.getNetDividendRat()); // changed
+		
+		assertEquals(trx.getGrossDividendRat().doubleValue(), trx.getGrossDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(trx.getFeesTaxesRat().doubleValue(),     trx.getFeesTaxes().doubleValue(), ConstTest.DIFF_TOLERANCE);
+		assertEquals(trx.getNetDividendRat().doubleValue(),   trx.getNetDividend().doubleValue(), ConstTest.DIFF_TOLERANCE);
+	}
+
+	private void test02_3_check_persisted(File outFile) throws Exception {
+		gcshOutFile = new GnuCashFileImpl(outFile);
+		gcshOutFileStats = new GCshFileStats(gcshOutFile);
+
+		GnuCashTransaction genTrx = gcshOutFile.getTransactionByID(TRX_1_ID);
+		assertNotEquals(null, genTrx);
+		assertEquals(TRX_1_ID, genTrx.getID());
+
+		GnuCashStockDividendTransactionImpl specTrxRO = new GnuCashStockDividendTransactionImpl((GnuCashTransactionImpl) genTrx);
+		assertNotEquals(null, specTrxRO);
+		assertEquals(TRX_1_ID, specTrxRO.getID());
+		
+		// ---
+		
+		assertEquals(6, specTrxRO.getSplitsCount());
+		
+		assertEquals("ea08a144322146cea38b39d134ca6fc1", specTrxRO.getStockAccountSplit().getID().toString());
+		assertEquals("5c5fa881869843d090a932f8e6b15af2", specTrxRO.getIncomeAccountSplit().getID().toString());
+		assertEquals(3, specTrxRO.getExpensesSplits().size());
+		assertEquals("1fd25550fb63498999ed85a7e935a0e3", specTrxRO.getExpensesSplits().get(0).getID().toString());
+		assertEquals("c99e8b5e6b5f410a8ff4fc188480e548", specTrxRO.getExpensesSplits().get(1).getID().toString());
+		assertEquals("dce93b2f38df47ceb6ae343a9d16f73b", specTrxRO.getExpensesSplits().get(2).getAccountID().toString()); // new; CAUTION: not ID (unpredictable), but ACCOUNT'S ID
+		assertEquals("7abf90fe15124254ac3eb7ec33f798e7", specTrxRO.getOffsettingAccountSplit().getID().toString());
+		
+		assertEquals(specTrxRO.getSplits().get(0).toString(), specTrxRO.getOffsettingAccountSplit().toString());
+		assertEquals(specTrxRO.getSplits().get(1).toString(), specTrxRO.getStockAccountSplit().toString());
+		assertEquals(specTrxRO.getSplits().get(2).toString(), specTrxRO.getExpensesSplits().get(0).toString());
+		assertEquals(specTrxRO.getSplits().get(3).toString(), specTrxRO.getExpensesSplits().get(1).toString());
+		assertEquals(specTrxRO.getSplits().get(4).toString(), specTrxRO.getIncomeAccountSplit().toString());
+		assertEquals(specTrxRO.getSplits().get(5).toString(), specTrxRO.getExpensesSplits().get(2).toString());
 		
 		// ---
 		

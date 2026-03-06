@@ -15,6 +15,7 @@ import org.gnucash.apispec.read.impl.TransactionValidationException;
 import org.gnucash.apispec.write.GnuCashWritableStockDividendTransaction;
 import org.gnucash.base.basetypes.complex.GCshCmdtyID;
 import org.gnucash.base.basetypes.complex.GCshSecID;
+import org.gnucash.base.basetypes.simple.GCshAcctID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,6 +148,17 @@ public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritable
 	}
 
 	@Override
+    public GnuCashWritableTransactionSplit getWritableExpensesSplit(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException {
+    	for ( GnuCashWritableTransactionSplit splt : getWritableExpensesSplits() ) {
+    		if ( splt.getAccountID().equals( expAcctID ) ) {
+    			return splt;
+    		}
+    	}
+    	
+    	throw new TransactionSplitNotFoundException();
+    }
+    
+	@Override
 	public List<GnuCashWritableTransactionSplit> getWritableExpensesSplits() throws TransactionSplitNotFoundException {
     	if ( getSplitsCount() == 0 )
     		throw new TransactionSplitNotFoundException();
@@ -198,6 +210,17 @@ public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritable
 		return null;
 	}
 
+    @Override
+    public GnuCashTransactionSplit getExpensesSplit(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException {
+    	for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+    		if ( splt.getAccountID().equals( expAcctID ) ) {
+    			return splt;
+    		}
+    	}
+    	
+    	throw new TransactionSplitNotFoundException();
+    }
+    
 	@Override
 	public List<GnuCashTransactionSplit> getExpensesSplits() throws TransactionSplitNotFoundException {
     	if ( getSplitsCount() == 0 )
@@ -232,12 +255,52 @@ public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritable
     
 	@Override
 	public FixedPointNumber getGrossDividend() throws TransactionSplitNotFoundException {
+		return getGrossDividend_Var1();
+	}
+
+	private FixedPointNumber getGrossDividend_Var1() throws TransactionSplitNotFoundException {
 		return getIncomeAccountSplit().getValue().negate(); // Notice: negate
+	}
+
+	private FixedPointNumber getGrossDividend_Var2() throws TransactionSplitNotFoundException {
+		return getNetDividend().add( getFeesTaxes() );
 	}
 
 	@Override
 	public BigFraction getGrossDividendRat() throws TransactionSplitNotFoundException {
+		return getGrossDividendRat_Var1();
+	}
+	
+	private BigFraction getGrossDividendRat_Var1() throws TransactionSplitNotFoundException {
 		return getIncomeAccountSplit().getValueRat().negate(); // Notice: negate
+	}
+
+	private BigFraction getGrossDividendRat_Var2() throws TransactionSplitNotFoundException {
+		return getNetDividendRat().add( getFeesTaxesRat() );
+	}
+
+	// ----------------------------
+
+	@Override
+	public FixedPointNumber getFeeTax(final GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				return splt.getValue();
+			}
+		}
+		
+		return FixedPointNumber.ZERO.copy(); // mutable
+	}
+
+	@Override
+	public BigFraction getFeeTaxRat(final GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				return splt.getValueRat();
+			}
+		}
+		
+		return BigFraction.ZERO;
 	}
 
 	@Override
@@ -262,30 +325,148 @@ public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritable
 		return result;
 	}
 
+	// ----------------------------
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedPointNumber getNetDividend() throws TransactionSplitNotFoundException
-	{
-		FixedPointNumber result = getGrossDividend();
-		
-		result.subtract( getFeesTaxes() ); // mutable
-		
-		return result;
+	public FixedPointNumber getNetDividend() throws TransactionSplitNotFoundException {
+		return getGrossDividend().subtract( getFeesTaxes() ); // mutable
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public BigFraction getNetDividendRat() throws TransactionSplitNotFoundException
+	public BigFraction getNetDividendRat() throws TransactionSplitNotFoundException	{
+		return getGrossDividendRat().subtract( getFeesTaxesRat() ); // immutable
+	}
+
+    // ---------------------------------------------------------------
+    
+	@Override
+	public void setStockAcctID(GCshAcctID stockAcctID) throws TransactionSplitNotFoundException	{
+		if ( stockAcctID == null ) {
+			throw new IllegalArgumentException("argument <stockAcctID> is null");
+		}
+		
+		if ( ! stockAcctID.isSet() ) {
+			throw new IllegalArgumentException("argument <stockAcctID> is not set");
+		}
+		
+		// ---
+		
+		GnuCashAccount stockAcct = getGnuCashFile().getAccountByID(stockAcctID);
+		if ( stockAcct == null ) {
+			LOGGER.error("setStockAcctID: " +
+					"Stock-buy transaction " + getID() + ": " +
+					"Could not find account with ID " + stockAcctID);
+			throw new IllegalStateException("Could not find account with ID " + stockAcctID);
+		}
+		
+		// ---
+		
+		setStockAcct(stockAcct);
+	}
+
+	@Override
+	public void setStockAcct(GnuCashAccount stockAcct) throws TransactionSplitNotFoundException	{
+		if ( stockAcct == null ) {
+			throw new IllegalArgumentException("argument <stockAcct> is null");
+		}
+		
+		// ---
+		
+		if ( stockAcct.getType() != GnuCashAccount.Type.STOCK ) {
+			LOGGER.error("setStockAcct: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Account with ID " + stockAcct.getID() + " is not of type " + GnuCashAccount.Type.STOCK);
+			throw new IllegalArgumentException("Account with ID " + stockAcct.getID() + " is not of type " + GnuCashAccount.Type.STOCK);
+		}
+		
+		boolean acctChange = false;
+		GCshAcctID oldAcctID = getStockAccountSplit().getAccountID();
+		if ( ! oldAcctID.equals( stockAcct.getID() ) ) {
+			acctChange = true;
+		}
+		if ( acctChange ) {
+			LOGGER.debug("setStockAcct: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Changing offsetting account ID from " + oldAcctID + " to " + stockAcct.getID());
+		}
+
+		// ---
+		
+		getWritableStockAccountSplit().setAccountID(stockAcct.getID());
+	}
+
+	// ----------------------------
+
+	@Override
+	public void setOffsetttingAcctID(GCshAcctID offsettingAcctID) throws TransactionSplitNotFoundException
 	{
-		BigFraction result = getGrossDividendRat();
+		if ( offsettingAcctID == null ) {
+			throw new IllegalArgumentException("argument <offsettingAcctID> is null");
+		}
 		
-		result = result.subtract( getFeesTaxesRat() ); // immutable
+		if ( ! offsettingAcctID.isSet() ) {
+			throw new IllegalArgumentException("argument <offsettingAcctID> is not set");
+		}
 		
-		return result;
+		// ---
+		
+		GnuCashAccount offsettingAcct = getGnuCashFile().getAccountByID(offsettingAcctID);
+		if ( offsettingAcct == null ) {
+			LOGGER.error("setStockAcctID: " +
+					"Stock-buy transaction " + getID() + ": " +
+					"Could not find account with ID " + offsettingAcctID);
+			throw new IllegalStateException("Could not find account with ID " + offsettingAcctID);
+		}
+		
+		// ---
+		
+		setOffsetttingAcct(offsettingAcct);
+	}
+
+	@Override
+	public void setOffsetttingAcct(GnuCashAccount offsettingAcct) throws TransactionSplitNotFoundException
+	{
+		if ( offsettingAcct == null ) {
+			throw new IllegalArgumentException("argument <offsettingAcct> is null");
+		}
+		
+		// ---
+		
+		if ( offsettingAcct.getType() != GnuCashAccount.Type.BANK ) {
+			LOGGER.error("setOffsetttingAcct: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Account with ID " + offsettingAcct.getID() + " is not of type " + GnuCashAccount.Type.BANK);
+			throw new IllegalArgumentException("Account with ID " + offsettingAcct.getID() + " is not of type " + GnuCashAccount.Type.BANK);
+		}
+		
+		boolean acctChange = false;
+		GCshAcctID oldAcctID = getStockAccountSplit().getAccountID();
+		if ( ! oldAcctID.equals( offsettingAcct.getID() ) ) {
+			acctChange = true;
+		}
+		if ( acctChange ) {
+			LOGGER.debug("setOffsetttingAcct: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Changing offsetting account ID from " + oldAcctID + " to " + offsettingAcct.getID());
+		}
+
+		// ---
+		
+		getWritableOffsettingAccountSplit().setAccountID(offsettingAcct.getID());
+	}
+
+    // ---------------------------------------------------------------
+
+	@Override
+	public void refreshNetDividend() throws TransactionSplitNotFoundException {
+		FixedPointNumber netDiv = getGrossDividend_Var2().subtract( getFeesTaxes() ); // <-- important: Var2
+		setNetDividend(netDiv);
 	}
 
     // ---------------------------------------------------------------
@@ -323,6 +504,135 @@ public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritable
 		getWritableIncomeAccountSplit().setQuantity(amtNeg);
 		getWritableIncomeAccountSplit().setValue(amtNeg);
 	}
+
+	// ----------------------------
+
+	@Override
+	public void addFeeTax(GCshAcctID expAcctID, FixedPointNumber amt) throws TransactionSplitNotFoundException {
+		if ( expAcctID == null ) {
+			throw new IllegalArgumentException("argument <expAcctID> is null");
+		}
+		
+		if ( ! expAcctID.isSet() ) {
+			throw new IllegalArgumentException("argument <expAcctID> is not set");
+		}
+		
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		if ( amt.equals(FixedPointNumber.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is = 0");
+		}
+		
+		// ---
+		
+		GnuCashAccount expAcct = getGnuCashFile().getAccountByID(expAcctID);
+		if ( expAcct == null ) {
+			LOGGER.error("addFeeTax: " +
+					"Stock-buy transaction " + getID() + ": " +
+					"Could not find account with ID " + expAcctID);
+			throw new IllegalStateException("Could not find account with ID " + expAcctID);
+		}
+		
+		if ( expAcct.getType() != GnuCashAccount.Type.EXPENSE ) {
+			LOGGER.error("addFeeTax: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Account with ID " + expAcct.getID() + " is not of type " + GnuCashAccount.Type.EXPENSE);
+			throw new IllegalArgumentException("Account with ID " + expAcct.getID() + " is not of type " + GnuCashAccount.Type.EXPENSE);
+		}
+		
+		// ---
+
+		GnuCashWritableTransactionSplit expSplt = null;
+		for ( GnuCashWritableTransactionSplit splt : getWritableExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				expSplt = splt;
+				LOGGER.warn("addFeeTax: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Created new split for account " + expAcctID + ": " + splt.getID());
+				LOGGER.warn("addFeeTax: Will overwrite data");
+				break;
+			}
+		}
+		if ( expSplt == null ) {
+			expSplt = createWritableSplit(expAcct);
+			LOGGER.debug("addFeeTax: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Created new split for account " + expAcctID + ": " + expSplt.getID());
+		}
+		
+		expSplt.setQuantity(amt);
+		expSplt.setValue(amt);
+	}
+
+	@Override
+	public void addFeeTax(GCshAcctID expAcctID, BigFraction amt) throws TransactionSplitNotFoundException {
+		if ( expAcctID == null ) {
+			throw new IllegalArgumentException("argument <expAcctID> is null");
+		}
+		
+		if ( ! expAcctID.isSet() ) {
+			throw new IllegalArgumentException("argument <expAcctID> is not set");
+		}
+		
+		if ( amt == null ) {
+			throw new IllegalArgumentException("argument <amt> is null");
+		}
+		
+		if ( amt.equals(BigFraction.ZERO) ) {
+			throw new IllegalArgumentException("argument <amt> is = 0");
+		}
+		
+		// ---
+		
+		GnuCashAccount expAcct = getGnuCashFile().getAccountByID(expAcctID);
+		if ( expAcct == null ) {
+			LOGGER.error("addFeeTax: " +
+					"Stock-buy transaction " + getID() + ": " +
+					"Could not find account with ID " + expAcctID);
+			throw new IllegalStateException("Could not find account with ID " + expAcctID);
+		}
+		
+		if ( expAcct.getType() != GnuCashAccount.Type.EXPENSE ) {
+			LOGGER.error("addFeeTax: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Account with ID " + expAcct.getID() + " is not of type " + GnuCashAccount.Type.EXPENSE);
+			throw new IllegalArgumentException("Account with ID " + expAcct.getID() + " is not of type " + GnuCashAccount.Type.EXPENSE);
+		}
+		
+		// ---
+
+		GnuCashWritableTransactionSplit expSplt = null;
+		for ( GnuCashWritableTransactionSplit splt : getWritableExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				expSplt = splt;
+				LOGGER.warn("addFeeTax: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Created new split for account " + expAcctID + ": " + splt.getID());
+				LOGGER.warn("addFeeTax: Will overwrite data");
+				break;
+			}
+		}
+		if ( expSplt == null ) {
+			expSplt = createWritableSplit(expAcct);
+			LOGGER.debug("addFeeTax: " +
+						"Stock-buy transaction " + getID() + ": " +
+						"Created new split for account " + expAcctID + ": " + expSplt.getID());
+		}
+		
+		expSplt.setQuantity(amt);
+		expSplt.setValue(amt);
+	}
+
+	@Override
+	public void clearFeesTaxes() throws TransactionSplitNotFoundException {
+		for ( GnuCashWritableTransactionSplit splt : getWritableExpensesSplits() ) {
+			getGnuCashFile().removeTransactionSplit(splt);
+		}
+	}
+
+	// ----------------------------
 
 	@Override
 	public void setNetDividend(final FixedPointNumber amt) throws TransactionSplitNotFoundException {
@@ -473,7 +783,7 @@ public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritable
 		}
 		
 		if ( splt.getQuantity().doubleValue() >= 0.0 ) {
-			String msg = "the split's shares is not valid";
+			String msg = "the split's quantity is not valid";
 			LOGGER.error("validateIncomeAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}

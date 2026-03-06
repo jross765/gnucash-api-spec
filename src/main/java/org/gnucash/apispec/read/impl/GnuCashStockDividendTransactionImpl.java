@@ -12,7 +12,7 @@ import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.api.read.impl.GnuCashTransactionSplitImpl;
 import org.gnucash.apispec.read.GnuCashStockDividendTransaction;
 import org.gnucash.base.basetypes.complex.GCshCmdtyID;
-import org.gnucash.base.basetypes.complex.GCshSecID;
+import org.gnucash.base.basetypes.simple.GCshAcctID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +115,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 			try {
 				validateStockAcctSplit(splt);
 			} catch ( TransactionValidationException exc ) {
-				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a dividend transaction");
+				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-dividend transaction");
 			} catch ( Exception exc ) {
 				throw new IllegalArgumentException("argument <trx>: something went wrong");
 			}
@@ -123,7 +123,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 			try {
 				validateTaxesFeesAcctSplit(splt);
 			} catch ( TransactionValidationException exc ) {
-				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a dividend transaction");
+				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-dividend transaction");
 			} catch ( Exception exc ) {
 				throw new IllegalArgumentException("argument <trx>: something went wrong");
 			}
@@ -131,7 +131,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 			try {
 				validateOffsettingAcctSplit(splt);
 			} catch ( TransactionValidationException exc ) {
-				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a dividend transaction");
+				throw new IllegalArgumentException("argument <trx> does not meet the criteria for a stock-dividend transaction");
 			} catch ( Exception exc ) {
 				throw new IllegalArgumentException("argument <trx>: something went wrong");
 			}
@@ -435,6 +435,18 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 		return null;
 	}
 
+	@Override
+	public GnuCashTransactionSplit getExpensesSplit(GCshAcctID expAcctID) throws TransactionSplitNotFoundException
+	{
+    	for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+    		if ( splt.getAccountID().equals( expAcctID ) ) {
+    			return splt;
+    		}
+    	}
+    	
+    	throw new TransactionSplitNotFoundException();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -491,6 +503,28 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 	public BigFraction getGrossDividendRat() throws TransactionSplitNotFoundException
 	{
 		return getIncomeAccountSplit().getValueRat().negate();
+	}
+
+	@Override
+	public FixedPointNumber getFeeTax(GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				return splt.getValue();
+			}
+		}
+		
+		throw new TransactionSplitNotFoundException();
+	}
+
+	@Override
+	public BigFraction getFeeTaxRat(GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
+		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+			if ( splt.getAccountID().equals( expAcctID ) ) {
+				return splt.getValueRat();
+			}
+		}
+		
+		throw new TransactionSplitNotFoundException();
 	}
 
 	/**

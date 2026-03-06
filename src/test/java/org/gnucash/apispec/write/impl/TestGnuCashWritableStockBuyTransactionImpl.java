@@ -335,7 +335,7 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 			assertEquals(0, 1);
 		}
 
-		// The twist: Add second fee/tax entry
+		// The twist: Add third fee/tax entry
 		FixedPointNumber newFeeVal = new FixedPointNumber("1.25");
 		specTrxRW.addFeeTax( new GCshAcctID("4681684348c64a10bac7f6e82a07f7d6"), newFeeVal ); // Root Account:Aufwendungen:Steuern
 		

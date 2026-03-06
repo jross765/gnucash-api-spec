@@ -872,8 +872,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	// ----------------------------
 	
 	@Override
-	public void refreshGrossPrice() throws TransactionSplitNotFoundException
-	{
+	public void refreshGrossPrice() throws TransactionSplitNotFoundException {
 		FixedPointNumber grossPrc = getNetPrice_Var2().add( getFeesTaxes() ); // <-- important: Var2
 		setGrossPrice(grossPrc);
 	}

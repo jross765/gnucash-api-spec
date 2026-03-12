@@ -494,6 +494,9 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 		return getStockAccountSplit().getValue();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public BigFraction getNetPriceRat() throws TransactionSplitNotFoundException {
 		return getNetPriceRat_Var1();

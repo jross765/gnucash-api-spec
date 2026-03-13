@@ -195,9 +195,23 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 		buffer.append(", description='");
 		buffer.append(getDescription() + "'");
 
-		buffer.append(", split=");
+//		buffer.append(", split=");
+//		try {
+//			buffer.append(getSplit().getID());
+//		} catch (Exception e) {
+//			buffer.append("ERROR");
+//		}
+
+		buffer.append(", stock-acct=");
 		try {
-			buffer.append(getSplit().getID());
+			buffer.append(getSplit().getAccount().getID());
+		} catch (Exception e) {
+			buffer.append("ERROR");
+		}
+
+		buffer.append(", factor=");
+		try {
+			buffer.append(getSplitFactor());
 		} catch (Exception e) {
 			buffer.append("ERROR");
 		}

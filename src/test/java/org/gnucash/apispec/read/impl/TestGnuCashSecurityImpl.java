@@ -12,7 +12,6 @@ import org.gnucash.apispec.read.GnuCashFileExt;
 import org.gnucash.apispec.read.GnuCashSecurity;
 import org.gnucash.base.basetypes.complex.GCshCmdtyID;
 import org.gnucash.base.basetypes.complex.GCshCmdtyNameSpace;
-import org.gnucash.base.basetypes.complex.GCshSecID;
 import org.gnucash.base.basetypes.complex.GCshSecID_Exchange;
 import org.gnucash.base.basetypes.complex.GCshSecID_SecIdType;
 import org.junit.Before;
@@ -23,35 +22,35 @@ import junit.framework.JUnit4TestAdapter;
 public class TestGnuCashSecurityImpl {
 	// Mercedes-Benz Group AG
 	public static final GCshCmdtyNameSpace.Exchange SEC_1_EXCH = GCshCmdtyNameSpace.Exchange.EURONEXT;
-	public static final String SEC_1_ID   = "MBG";
+	public static final String SEC_1_CODE = "MBG";
 	public static final String SEC_1_ISIN = "DE0007100000";
 
 	// SAP SE
 	public static final GCshCmdtyNameSpace.Exchange SEC_2_EXCH = GCshCmdtyNameSpace.Exchange.EURONEXT;
-	public static final String SEC_2_ID   = "SAP";
+	public static final String SEC_2_CODE = "SAP";
 	public static final String SEC_2_ISIN = "DE0007164600";
 
 	// AstraZeneca Plc
 	// Note that in the SecIDType variants, the ISIN/CUSIP/SEDOL/WKN/whatever
 	// is stored twice in the object, redundantly
 	public static final GCshCmdtyNameSpace.SecIdType SEC_3_SECIDTYPE = GCshCmdtyNameSpace.SecIdType.ISIN;
-	public static final String SEC_3_ID   = "GB0009895292";
-	public static final String SEC_3_ISIN = SEC_3_ID;
+	public static final String SEC_3_CODE = "GB0009895292";
+	public static final String SEC_3_ISIN = SEC_3_CODE;
 
 	// Coca Cola
 	public static final GCshCmdtyNameSpace.SecIdType SEC_4_SECIDTYPE = GCshCmdtyNameSpace.SecIdType.ISIN;
-	public static final String SEC_4_ID   = "US1912161007";
-	public static final String SEC_4_ISIN = SEC_4_ID;
+	public static final String SEC_4_CODE = "US1912161007";
+	public static final String SEC_4_ISIN = SEC_4_CODE;
 
 	// -----------------------------------------------------------------
 
 	private GnuCashFileExt  gcshFile = null;
 	private GnuCashSecurity sec = null;
 
-	private GCshSecID secID1 = null;
-	private GCshSecID secID2 = null;
-	private GCshSecID secID3 = null;
-	private GCshSecID secID4 = null;
+	private GCshSecID_Exchange  secID1 = new GCshSecID_Exchange( SEC_1_EXCH, SEC_1_CODE );
+	private GCshSecID_Exchange  secID2 = new GCshSecID_Exchange( SEC_2_EXCH, SEC_2_CODE );
+	private GCshSecID_SecIdType secID3 = new GCshSecID_SecIdType( SEC_3_SECIDTYPE , SEC_3_ISIN );
+	private GCshSecID_SecIdType secID4 = null;
 
 	// -----------------------------------------------------------------
 
@@ -88,10 +87,10 @@ public class TestGnuCashSecurityImpl {
 
 		// ---
 
-		secID1 = new GCshSecID_Exchange(SEC_1_EXCH, SEC_1_ID);
-		secID2 = new GCshSecID_Exchange(SEC_2_EXCH, SEC_2_ID);
-		secID3 = new GCshSecID_SecIdType(SEC_3_SECIDTYPE, SEC_3_ID);
-		secID4 = new GCshSecID_SecIdType(SEC_4_SECIDTYPE, SEC_4_ID);
+		secID1 = new GCshSecID_Exchange(SEC_1_EXCH, SEC_1_CODE);
+		secID2 = new GCshSecID_Exchange(SEC_2_EXCH, SEC_2_CODE);
+		secID3 = new GCshSecID_SecIdType(SEC_3_SECIDTYPE, SEC_3_CODE);
+		secID4 = new GCshSecID_SecIdType(SEC_4_SECIDTYPE, SEC_4_CODE);
 	}
 
 	// -----------------------------------------------------------------
@@ -99,16 +98,16 @@ public class TestGnuCashSecurityImpl {
 	@Test
 	public void test00() throws Exception {
 		// Cf. TestsecID -- let's just double-check
-		assertEquals(SEC_1_EXCH.toString() + GCshCmdtyID.SEPARATOR + SEC_1_ID, secID1.toString());
-		assertEquals(SEC_2_EXCH.toString() + GCshCmdtyID.SEPARATOR + SEC_2_ID, secID2.toString());
-		assertEquals(SEC_3_SECIDTYPE.toString() + GCshCmdtyID.SEPARATOR + SEC_3_ID, secID3.toString());
+		assertEquals(SEC_1_EXCH.toString() + GCshCmdtyID.SEPARATOR + SEC_1_CODE, secID1.toString());
+		assertEquals(SEC_2_EXCH.toString() + GCshCmdtyID.SEPARATOR + SEC_2_CODE, secID2.toString());
+		assertEquals(SEC_3_SECIDTYPE.toString() + GCshCmdtyID.SEPARATOR + SEC_3_CODE, secID3.toString());
 	}
 
 	// ------------------------------
 
 	@Test
 	public void test01_1() throws Exception {
-		sec = gcshFile.getSecurityByNamSpcCode(SEC_1_EXCH, SEC_1_ID);
+		sec = gcshFile.getSecurityByNamSpcCode(SEC_1_EXCH, SEC_1_CODE);
 		assertNotEquals(null, sec);
 
 		assertEquals(secID1.toString(), sec.getQualifID().toString());
@@ -120,19 +119,19 @@ public class TestGnuCashSecurityImpl {
 		assertEquals("Mercedes-Benz Group AG", sec.getName());
 	}
 
-//	@Test
-//	public void test01_2() throws Exception {
-//		sec = gcshFile.getSecurityByQualifID(secID1.toString());
-//		assertNotEquals(null, sec);
-//
-//		assertEquals(secID1.toString(), sec.getQualifID().toString());
-//		// *Not* equal because of class
-//		assertNotEquals(secID1, sec.getQualifID());
-//		// ::TODO: Convert to GCshSecID_Exchange, then it should be equal
-//		//    assertEquals(secID1, sec.getQualifID()); // not trivial!
-//		assertEquals(SEC_1_ISIN, sec.getXCode());
-//		assertEquals("Mercedes-Benz Group AG", sec.getName());
-//	}
+	@Test
+	public void test01_2() throws Exception {
+		sec = gcshFile.getSecurityByID(secID1);
+		assertNotEquals(null, sec);
+
+		assertEquals(secID1.toString(), sec.getQualifID().toString());
+		// *Not* equal because of class
+		assertNotEquals(secID1, sec.getQualifID());
+		// ::TODO: Convert to GCshSecID_Exchange, then it should be equal
+		//    assertEquals(secID1, sec.getQualifID()); // not trivial!
+		assertEquals(SEC_1_ISIN, sec.getXCode());
+		assertEquals("Mercedes-Benz Group AG", sec.getName());
+	}
 
 	@Test
 	public void test01_3() throws Exception {
@@ -187,7 +186,7 @@ public class TestGnuCashSecurityImpl {
 
 	@Test
 	public void test02_1() throws Exception {
-		sec = gcshFile.getSecurityByNamSpcCode(SEC_3_SECIDTYPE.toString(), SEC_3_ID);
+		sec = gcshFile.getSecurityByNamSpcCode(SEC_3_SECIDTYPE.toString(), SEC_3_CODE);
 		assertNotEquals(null, sec);
 
 		assertEquals(secID3.toString(), sec.getQualifID().toString());

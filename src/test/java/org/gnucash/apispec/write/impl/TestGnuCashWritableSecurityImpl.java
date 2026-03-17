@@ -33,19 +33,19 @@ import junit.framework.JUnit4TestAdapter;
 
 public class TestGnuCashWritableSecurityImpl {
 	public static final GCshCmdtyNameSpace.Exchange SEC_1_EXCH = TestGnuCashSecurityImpl.SEC_1_EXCH;
-	public static final String SEC_1_ID   = TestGnuCashSecurityImpl.SEC_1_ID;
+	public static final String SEC_1_CODE = TestGnuCashSecurityImpl.SEC_1_CODE;
 	public static final String SEC_1_ISIN = TestGnuCashSecurityImpl.SEC_1_ISIN;
 
 	public static final GCshCmdtyNameSpace.Exchange SEC_2_EXCH = TestGnuCashSecurityImpl.SEC_2_EXCH;
-	public static final String SEC_2_ID   = TestGnuCashSecurityImpl.SEC_2_ID;
+	public static final String SEC_2_CODE = TestGnuCashSecurityImpl.SEC_2_CODE;
 	public static final String SEC_2_ISIN = TestGnuCashSecurityImpl.SEC_2_ISIN;
 
 	public static final GCshCmdtyNameSpace.SecIdType SEC_3_SECIDTYPE = TestGnuCashSecurityImpl.SEC_3_SECIDTYPE;
-	public static final String SEC_3_ID   = TestGnuCashSecurityImpl.SEC_3_ID;
+	public static final String SEC_3_CODE = TestGnuCashSecurityImpl.SEC_3_CODE;
 	public static final String SEC_3_ISIN = TestGnuCashSecurityImpl.SEC_3_ISIN;
 
 	public static final GCshCmdtyNameSpace.SecIdType SEC_4_SECIDTYPE = TestGnuCashSecurityImpl.SEC_4_SECIDTYPE;
-	public static final String SEC_4_ID   = TestGnuCashSecurityImpl.SEC_4_ID;
+	public static final String SEC_4_CODE = TestGnuCashSecurityImpl.SEC_4_CODE;
 	public static final String SEC_4_ISIN = TestGnuCashSecurityImpl.SEC_4_ISIN;
 
 	// -----------------------------------------------------------------
@@ -100,10 +100,10 @@ public class TestGnuCashWritableSecurityImpl {
 
 		// ---
 
-		secID1 = new GCshSecID_Exchange(SEC_1_EXCH, SEC_1_ID);
-		secID2 = new GCshSecID_Exchange(SEC_2_EXCH, SEC_2_ID);
-		secID3 = new GCshSecID_SecIdType(SEC_3_SECIDTYPE, SEC_3_ID);
-		secID4 = new GCshSecID_SecIdType(SEC_4_SECIDTYPE, SEC_4_ID);
+		secID1 = new GCshSecID_Exchange(SEC_1_EXCH, SEC_1_CODE);
+		secID2 = new GCshSecID_Exchange(SEC_2_EXCH, SEC_2_CODE);
+		secID3 = new GCshSecID_SecIdType(SEC_3_SECIDTYPE, SEC_3_CODE);
+		secID4 = new GCshSecID_SecIdType(SEC_4_SECIDTYPE, SEC_4_CODE);
 	}
 
 	// -----------------------------------------------------------------
@@ -119,7 +119,7 @@ public class TestGnuCashWritableSecurityImpl {
 	
 	@Test
 	public void test01_1() throws Exception {
-		GnuCashWritableSecurity sec = gcshInFile.getWritableSecurityByQualifID(SEC_1_EXCH, SEC_1_ID);
+		GnuCashWritableSecurity sec = gcshInFile.getWritableSecurityByQualifID(SEC_1_EXCH, SEC_1_CODE);
 		assertNotEquals(null, sec);
 
 		assertEquals(secID1.toString(), sec.getQualifID().toString());

@@ -25,11 +25,11 @@ public interface GnuCashFileExt extends GnuCashFile
 
 	GnuCashSecurity getSecurityByNamSpcCode(String nameSpace, String code);
 	
-	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.Exchange exchange, String code);
+	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.Exchange exchange, String tkr);
 
-	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.MIC mic, String code);
+	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.MIC mic, String micID);
 
-	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.SecIdType secIdType, String code);
+	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.SecIdType secIdType, String secID);
 
 	GnuCashSecurity getSecurityByXCode(String xCode);
 

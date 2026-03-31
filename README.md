@@ -100,9 +100,9 @@ you might wonder: "There are a couple of special classes in the module 'API', th
 
   **Longer answer**
 
-  The author / current maintainer has had more than one thought over this.
+  The author / current maintainer has had more than one thought over this. Here is his current assessment (march 2026):
 
-  He has -- as an experiment -- tried to move the `spec` packages from module "API" to this one. Without getting too much into the technical details: It is near-impossible to accomplish this without a major redesign. And even if he did that: The result would not be very satisfactory, neither from his point of view (maintenance) nor from the point of view of the user. You would have lots of confusing "base" variants of classes in "API" and extended ones (derived from the base classes) in this module. And it would, in many instances, not be clear which one to choose without getting *very* deep into the weeds.
+  He has -- as an experiment -- tried to move the `spec` packages from module "API (Core)" to this one. Without getting too much into the technical details: It is possible, of course, but it would necessitate a major redesign, to the point of almost being a project of its own. And even if he did that: The result would not be very satisfactory, neither from his own point of view (maintenance) nor from the point of view of the user-developer. You would have a whole bunch of confusing "base" variants of classes in "API (Core)" and extended ones (derived from the base classes) in this module -- so many that it would be confusing; it would, in many instances, not be clear which one to choose without getting *very* deep into the weeds.
 
   As for the "kind of 'special'": 
 

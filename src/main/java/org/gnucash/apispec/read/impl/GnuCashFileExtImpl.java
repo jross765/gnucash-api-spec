@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 
 import org.gnucash.api.read.GnuCashCommodity;
 import org.gnucash.api.read.GnuCashFile;
+import org.gnucash.api.read.GnuCashTransactionSplit;
 import org.gnucash.api.read.impl.GnuCashCommodityImpl;
 import org.gnucash.api.read.impl.GnuCashFileImpl;
 import org.gnucash.apispec.read.GnuCashCurrency;
@@ -152,4 +154,21 @@ public class GnuCashFileExtImpl extends GnuCashFileImpl
 		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByNameUniq(expr) );
 	}
 
+	// ---------------------------------------------------------------
+
+	@Override
+	public List<GnuCashTransactionSplit> getTransactionSplitsBySecID(final GCshSecID secID) {
+		return getTransactionSplitsByCmdtyID(secID);
+	}
+
+	@Override
+	public List<GnuCashTransactionSplit> getTransactionSplitsByCurrID(final GCshCurrID currID) {
+		return getTransactionSplitsByCmdtyID(currID);
+	}
+
+	@Override
+	public List<GnuCashTransactionSplit> getTransactionSplitsByCurr(final Currency curr) {
+		return getTransactionSplitsByCmdtyID(new GCshCmdtyID(curr));
+	}
+	
 }

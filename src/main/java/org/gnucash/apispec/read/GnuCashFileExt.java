@@ -1,44 +1,16 @@
 package org.gnucash.apispec.read;
 
-import java.util.List;
-
 import org.gnucash.api.read.GnuCashFile;
-import org.gnucash.base.basetypes.complex.GCshCmdtyNameSpace;
-import org.gnucash.base.basetypes.complex.GCshCurrID;
-import org.gnucash.base.basetypes.complex.GCshSecID;
+import org.gnucash.apispec.read.hlp.fil.GnuCashFileExt_Curr;
+import org.gnucash.apispec.read.hlp.fil.GnuCashFileExt_Sec;
+import org.gnucash.apispec.read.hlp.fil.GnuCashFileExt_TrxSplt;
 
-import xyz.schnorxoborx.base.beanbase.NoEntryFoundException;
-import xyz.schnorxoborx.base.beanbase.TooManyEntriesFoundException;
-
-public interface GnuCashFileExt extends GnuCashFile
+public interface GnuCashFileExt extends GnuCashFile,
+                                        GnuCashFileExt_Curr,
+                                        GnuCashFileExt_Sec,
+                                        GnuCashFileExt_TrxSplt
 {
 
-	GnuCashCurrency getCurrencyByID(GCshCurrID currID);
-	
-	GnuCashCurrency getCurrencyByISOCode(String expr);
-
-	List<GnuCashCurrency> getCurrencies();
-	
-	// ---------------------------------------------------------------
-	
-	GnuCashSecurity getSecurityByID(GCshSecID secID);
-
-	GnuCashSecurity getSecurityByNamSpcCode(String nameSpace, String code);
-	
-	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.Exchange exchange, String tkr);
-
-	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.MIC mic, String micID);
-
-	GnuCashSecurity getSecurityByNamSpcCode(GCshCmdtyNameSpace.SecIdType secIdType, String secID);
-
-	GnuCashSecurity getSecurityByXCode(String xCode);
-
-	List<GnuCashSecurity> getSecurities();
-	
-    List<GnuCashSecurity> getSecuritiesByName(String expr);
-
-    List<GnuCashSecurity> getSecuritiesByName(String expr, boolean relaxed);
-
-    GnuCashSecurity getSecurityByNameUniq(String expr) throws NoEntryFoundException, TooManyEntriesFoundException;
+	// ::EMPTY
 
 }

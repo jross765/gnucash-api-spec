@@ -5,14 +5,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.List;
 
 import org.gnucash.api.read.GnuCashCommodity;
+import org.gnucash.api.read.GnuCashTransactionSplit;
 import org.gnucash.api.read.impl.GnuCashCommodityImpl;
 import org.gnucash.api.write.GnuCashWritableCommodity;
+import org.gnucash.api.write.GnuCashWritableTransactionSplit;
 import org.gnucash.api.write.ObjectCascadeException;
 import org.gnucash.api.write.impl.GnuCashWritableCommodityImpl;
 import org.gnucash.api.write.impl.GnuCashWritableFileImpl;
+import org.gnucash.api.write.impl.GnuCashWritableTransactionSplitImpl;
 import org.gnucash.apispec.read.GnuCashCurrency;
 import org.gnucash.apispec.read.GnuCashSecurity;
 import org.gnucash.apispec.read.impl.GnuCashCurrencyImpl;
@@ -97,7 +101,7 @@ public class GnuCashWritableFileExtImpl extends GnuCashWritableFileImpl
 		super.removeCommodity(curr);
 	}
 	
-	// ----------------------------
+	// ---------------------------------------------------------------
 
 	@Override
 	public GnuCashWritableSecurity getWritableSecurityByID(GCshSecID secID) {
@@ -192,6 +196,41 @@ public class GnuCashWritableFileExtImpl extends GnuCashWritableFileImpl
 	@Override
 	public void removeSecurity(final GnuCashWritableSecurity sec) throws ObjectCascadeException {
 		super.removeCommodity(sec);
+	}
+
+	// ---------------------------------------------------------------
+	
+	@Override
+	public List<GnuCashWritableTransactionSplit> getWritableTransactionSplitsBySecID(final GCshSecID secID) {
+		ArrayList<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
+		
+		for ( GnuCashTransactionSplit splt : getTransactionSplitsBySecID(secID) ) {
+			result.add( new GnuCashWritableTransactionSplitImpl(splt) );
+		}
+		
+		return result;
+	}
+
+	@Override
+	public List<GnuCashWritableTransactionSplit> getWritableTransactionSplitsByCurrID(final GCshCurrID currID) {
+		ArrayList<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
+		
+		for ( GnuCashTransactionSplit splt : getTransactionSplitsByCurrID(currID) ) {
+			result.add( new GnuCashWritableTransactionSplitImpl(splt) );
+		}
+		
+		return result;
+	}
+
+	@Override
+	public List<GnuCashWritableTransactionSplit> getWritableTransactionSplitsByCurr(final Currency curr) {
+		ArrayList<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
+		
+		for ( GnuCashTransactionSplit splt : getTransactionSplitsByCurr(curr) ) {
+			result.add( new GnuCashWritableTransactionSplitImpl(splt) );
+		}
+		
+		return result;
 	}
 
 	// ---------------------------------------------------------------
@@ -295,6 +334,23 @@ public class GnuCashWritableFileExtImpl extends GnuCashWritableFileImpl
 	@Override
 	public GnuCashSecurity getSecurityByNameUniq(final String expr) throws NoEntryFoundException, TooManyEntriesFoundException {
 		return new GnuCashSecurityImpl( (GnuCashCommodityImpl) getCommodityByNameUniq(expr) );
+	}
+
+	// ---------------------------------------------------------------
+
+	@Override
+	public List<GnuCashTransactionSplit> getTransactionSplitsBySecID(final GCshSecID secID) {
+		return getTransactionSplitsByCmdtyID(secID);
+	}
+
+	@Override
+	public List<GnuCashTransactionSplit> getTransactionSplitsByCurrID(final GCshCurrID currID) {
+		return getTransactionSplitsByCmdtyID(currID);
+	}
+
+	@Override
+	public List<GnuCashTransactionSplit> getTransactionSplitsByCurr(final Currency curr) {
+		return getTransactionSplitsByCmdtyID(new GCshCmdtyID(curr));
 	}
 
 }

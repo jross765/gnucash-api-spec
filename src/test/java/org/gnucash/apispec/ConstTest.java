@@ -1,6 +1,6 @@
 package org.gnucash.apispec;
 
-// On purpose redundant to according class in org.kmymoney.api
+// On purpose redundant to according class in org.gnucash.api
 public class ConstTest {
 
     public static final String GCSH_FILENAME     = "test.gnucash";

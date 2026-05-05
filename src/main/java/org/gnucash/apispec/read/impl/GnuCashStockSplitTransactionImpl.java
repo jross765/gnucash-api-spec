@@ -119,6 +119,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 	// ---------------------------------------------------------------
 	
 	@Override
+    @Deprecated
 	public FixedPointNumber getSplitFactor() throws TransactionSplitNotFoundException {
 		return getNofSharesAfterSplit().divide( getNofSharesBeforeSplit() );
 	}
@@ -129,6 +130,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 	}
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofAddShares() throws TransactionSplitNotFoundException {
 		return getSplit().getQuantity();
 	}
@@ -139,6 +141,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 	}
 	
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofSharesBeforeSplit() throws TransactionSplitNotFoundException {
 		GnuCashAccount acct = getSplit().getAccount();
 		return acct.getBalance(getPreviousSplit());
@@ -151,6 +154,7 @@ public class GnuCashStockSplitTransactionImpl extends GnuCashTransactionImpl
 	}
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofSharesAfterSplit() throws TransactionSplitNotFoundException {
 		GnuCashAccount acct = getSplit().getAccount();
 		return acct.getBalance(getSplit());

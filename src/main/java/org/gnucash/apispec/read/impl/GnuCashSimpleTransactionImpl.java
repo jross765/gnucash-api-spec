@@ -182,6 +182,7 @@ public class GnuCashSimpleTransactionImpl extends GnuCashTransactionImpl
 
     // ---------------------------------------------------------------
     
+    @Deprecated
     public FixedPointNumber getAmount() throws TransactionSplitNotFoundException {
     	return getSecondSplit().getValue();
     }

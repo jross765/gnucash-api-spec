@@ -44,6 +44,7 @@ public interface GnuCashSimpleTransaction extends GnuCashTransaction,
 
     // ---------------------------------------------------------------
     
+    @Deprecated
     FixedPointNumber getAmount() throws TransactionSplitNotFoundException;
     
     BigFraction      getAmountRat() throws TransactionSplitNotFoundException;

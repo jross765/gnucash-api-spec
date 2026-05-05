@@ -42,26 +42,31 @@ public interface GnuCashWritableStockBuyTransaction extends GnuCashWritableTrans
     
     // ----------------------------
     
+    @Deprecated
     void setNofShares(FixedPointNumber val)  throws TransactionSplitNotFoundException;
     
     void setNofShares(BigFraction val)  throws TransactionSplitNotFoundException;
     
+    @Deprecated
     void setNofShares(GCshAcctID stockAcctID, FixedPointNumber val)  throws TransactionSplitNotFoundException;
     
     void setNofShares(GCshAcctID stockAcctID, BigFraction val)  throws TransactionSplitNotFoundException;
     
     // ---
     
+    @Deprecated
     void setPricePerShare(FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void setPricePerShare(BigFraction amt)  throws TransactionSplitNotFoundException;
     
+    @Deprecated
     void setPricePerShare(GCshAcctID stockAcctID, FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void setPricePerShare(GCshAcctID stockAcctID, BigFraction amt)  throws TransactionSplitNotFoundException;
     
     // ----------------------------
     
+    @Deprecated
     void addFeeTax(GCshAcctID expAcctID, FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void addFeeTax(GCshAcctID expAcctID, BigFraction amt)  throws TransactionSplitNotFoundException;
@@ -72,10 +77,12 @@ public interface GnuCashWritableStockBuyTransaction extends GnuCashWritableTrans
     
     // ----------------------------
     
+    @Deprecated
     void setGrossPrice(FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void setGrossPrice(BigFraction amt)  throws TransactionSplitNotFoundException;
     
+    @Deprecated
     void setGrossPrice(GCshAcctID offsettingAcctID, FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void setGrossPrice(GCshAcctID offsettingAcctID, BigFraction amt)  throws TransactionSplitNotFoundException;

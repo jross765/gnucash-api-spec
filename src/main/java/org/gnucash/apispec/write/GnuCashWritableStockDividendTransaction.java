@@ -44,12 +44,14 @@ public interface GnuCashWritableStockDividendTransaction extends GnuCashWritable
     
     // ----------------------------
     
+    @Deprecated
     void setGrossDividend(FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void setGrossDividend(BigFraction amt)  throws TransactionSplitNotFoundException;
     
     // ----------------------------
     
+    @Deprecated
     void addFeeTax(GCshAcctID expAcctID, FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void addFeeTax(GCshAcctID expAcctID, BigFraction amt)  throws TransactionSplitNotFoundException;
@@ -60,6 +62,7 @@ public interface GnuCashWritableStockDividendTransaction extends GnuCashWritable
     
     // ----------------------------
     
+    @Deprecated
     void setNetDividend(FixedPointNumber amt)  throws TransactionSplitNotFoundException;
     
     void setNetDividend(BigFraction amt)  throws TransactionSplitNotFoundException;

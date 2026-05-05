@@ -491,6 +491,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 	 * {@inheritDoc}
 	 */
 	@Override
+    @Deprecated
 	public FixedPointNumber getGrossDividend() throws TransactionSplitNotFoundException
 	{
 		return getIncomeAccountSplit().getValue().negate();
@@ -506,6 +507,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 	}
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getFeeTax(GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
 		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
 			if ( splt.getAccountID().equals( expAcctID ) ) {
@@ -531,6 +533,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 	 * {@inheritDoc}
 	 */
 	@Override
+    @Deprecated
 	public FixedPointNumber getFeesTaxes() throws TransactionSplitNotFoundException
 	{
 		FixedPointNumber result = FixedPointNumber.ZERO.copy(); // Caution: FPN is mutable!
@@ -561,6 +564,7 @@ public class GnuCashStockDividendTransactionImpl extends GnuCashTransactionImpl
 	 * {@inheritDoc}
 	 */
 	@Override
+    @Deprecated
 	public FixedPointNumber getNetDividend() throws TransactionSplitNotFoundException
 	{
 		FixedPointNumber result = getGrossDividend();

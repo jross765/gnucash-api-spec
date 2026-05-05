@@ -419,6 +419,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 	 * {@inheritDoc}
 	 */
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofShares() throws TransactionSplitNotFoundException {
 		return getStockAccountSplit().getQuantity();
 	}
@@ -434,10 +435,12 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
     // ----------------------------
     
 	@Override
+    @Deprecated
 	public FixedPointNumber getPricePerShare() throws TransactionSplitNotFoundException {
 		return getPricePerShare_Var1();
 	}
 
+    @Deprecated
 	private FixedPointNumber getPricePerShare_Var1() throws TransactionSplitNotFoundException {
 		FixedPointNumber result = getNetPrice_Var1();
 		
@@ -446,6 +449,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 		return result;
 	}
 
+    @Deprecated
 	private FixedPointNumber getPricePerShare_Var2() throws TransactionSplitNotFoundException {
 		FixedPointNumber result = getNetPrice_Var3();
 		
@@ -478,18 +482,22 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
     // ----------------------------
     
 	@Override
+    @Deprecated
 	public FixedPointNumber getNetPrice() throws TransactionSplitNotFoundException {
 		return getNetPrice_Var1();
 	}
 
+    @Deprecated
 	private FixedPointNumber getNetPrice_Var1() throws TransactionSplitNotFoundException {
 		return getGrossPrice().subtract( getFeesTaxes() );
 	}
 
+    @Deprecated
 	private FixedPointNumber getNetPrice_Var2() throws TransactionSplitNotFoundException {
 		return getNofShares().multiply( getPricePerShare() );
 	}
 
+    @Deprecated
 	private FixedPointNumber getNetPrice_Var3() throws TransactionSplitNotFoundException {
 		return getStockAccountSplit().getValue();
 	}
@@ -517,6 +525,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
     // ----------------------------
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getFeeTax(final GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
 		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
 			if ( splt.getAccountID().equals( expAcctID ) ) {
@@ -542,6 +551,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 	 * {@inheritDoc}
 	 */
 	@Override
+    @Deprecated
 	public FixedPointNumber getFeesTaxes() throws TransactionSplitNotFoundException {
 		FixedPointNumber result = FixedPointNumber.ZERO.copy(); // Caution: FPN is mutable!
 		
@@ -570,6 +580,7 @@ public class GnuCashStockBuyTransactionImpl extends GnuCashTransactionImpl
 	 * {@inheritDoc}
 	 */
 	@Override
+    @Deprecated
 	public FixedPointNumber getGrossPrice() throws TransactionSplitNotFoundException {
 		return getOffsettingAccountSplit().getValue().negate(); // Notice: negate
 	}

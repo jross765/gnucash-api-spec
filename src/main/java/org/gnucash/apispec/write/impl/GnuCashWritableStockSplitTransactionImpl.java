@@ -87,6 +87,7 @@ public class GnuCashWritableStockSplitTransactionImpl extends GnuCashWritableTra
 	// ---------------------------------------------------------------
 	
 	@Override
+    @Deprecated
 	public FixedPointNumber getSplitFactor() throws TransactionSplitNotFoundException {
 		return getNofSharesAfterSplit().divide( getNofSharesBeforeSplit() );
 	}
@@ -97,6 +98,7 @@ public class GnuCashWritableStockSplitTransactionImpl extends GnuCashWritableTra
 	}
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofAddShares() throws TransactionSplitNotFoundException {
 		return getSplit().getQuantity();
 	}
@@ -107,6 +109,7 @@ public class GnuCashWritableStockSplitTransactionImpl extends GnuCashWritableTra
 	}
 	
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofSharesBeforeSplit() throws TransactionSplitNotFoundException {
 		GnuCashAccount acct = getSplit().getAccount();
 		return acct.getBalance(getPreviousSplit());
@@ -119,6 +122,7 @@ public class GnuCashWritableStockSplitTransactionImpl extends GnuCashWritableTra
 	}
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofSharesAfterSplit() throws TransactionSplitNotFoundException {
 		GnuCashAccount acct = getSplit().getAccount();
 		return acct.getBalance(getSplit());
@@ -150,6 +154,7 @@ public class GnuCashWritableStockSplitTransactionImpl extends GnuCashWritableTra
 	// ---------------------------------------------------------------
     
 	@Override
+    @Deprecated
 	public void setSplitFactor(FixedPointNumber val) throws TransactionSplitNotFoundException
 	{
 		if ( val == null ) {
@@ -184,6 +189,7 @@ public class GnuCashWritableStockSplitTransactionImpl extends GnuCashWritableTra
 	}
 
 	@Override
+    @Deprecated
 	public void setNofAddShares(FixedPointNumber val) throws TransactionSplitNotFoundException
 	{
 		if ( val == null ) {
@@ -214,6 +220,7 @@ public class GnuCashWritableStockSplitTransactionImpl extends GnuCashWritableTra
 	}
 
 	@Override
+    @Deprecated
 	public void setNofSharesAfterSplit(FixedPointNumber val) throws TransactionSplitNotFoundException
 	{
 		if ( val == null ) {

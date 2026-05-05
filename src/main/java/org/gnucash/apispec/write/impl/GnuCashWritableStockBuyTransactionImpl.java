@@ -221,6 +221,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
     // ----------------------------
     
 	@Override
+    @Deprecated
 	public FixedPointNumber getNofShares() throws TransactionSplitNotFoundException {
 		return getStockAccountSplit().getQuantity();
 	}
@@ -233,10 +234,12 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
     // ----------------------------
     
 	@Override
+    @Deprecated
 	public FixedPointNumber getPricePerShare() throws TransactionSplitNotFoundException {
 		return getPricePerShare_Var2();
 	}
 
+    @Deprecated
 	private FixedPointNumber getPricePerShare_Var1() throws TransactionSplitNotFoundException {
 		FixedPointNumber result = getNetPrice_Var1();
 		
@@ -245,6 +248,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 		return result;
 	}
 
+    @Deprecated
 	private FixedPointNumber getPricePerShare_Var2() throws TransactionSplitNotFoundException {
 		FixedPointNumber result = getNetPrice_Var3();
 		
@@ -277,18 +281,22 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
     // ----------------------------
     
 	@Override
+    @Deprecated
 	public FixedPointNumber getNetPrice() throws TransactionSplitNotFoundException {
 		return getNetPrice_Var1();
 	}
 
+    @Deprecated
 	private FixedPointNumber getNetPrice_Var1() throws TransactionSplitNotFoundException {
 		return getGrossPrice().subtract( getFeesTaxes() );
 	}
 
+    @Deprecated
 	private FixedPointNumber getNetPrice_Var2() throws TransactionSplitNotFoundException {
 		return getNofShares().multiply( getPricePerShare() );
 	}
 
+    @Deprecated
 	private FixedPointNumber getNetPrice_Var3() throws TransactionSplitNotFoundException {
 		return getStockAccountSplit().getValue();
 	}
@@ -313,6 +321,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
     // ----------------------------
     
 	@Override
+    @Deprecated
 	public FixedPointNumber getFeeTax(final GCshAcctID expAcctID) throws TransactionSplitNotFoundException {
 		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
 			if ( splt.getAccountID().equals( expAcctID ) ) {
@@ -335,6 +344,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	}
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getFeesTaxes() throws TransactionSplitNotFoundException {
 		FixedPointNumber result = FixedPointNumber.ZERO.copy(); // Caution: FPN is mutable!
 		
@@ -357,6 +367,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	}
 
 	@Override
+    @Deprecated
 	public FixedPointNumber getGrossPrice() throws TransactionSplitNotFoundException {
 		return getOffsettingAccountSplit().getValue().negate(); // Notice: negate
 	}
@@ -487,6 +498,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
     // ---------------------------------------------------------------
     
 	@Override
+    @Deprecated
 	public void setNofShares(final FixedPointNumber val) throws TransactionSplitNotFoundException {
 		if ( val == null ) {
 			throw new IllegalArgumentException("argument <val> is null");
@@ -519,6 +531,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	// ----------------------------
 
 	@Override
+    @Deprecated
 	public void setNofShares(GCshAcctID stockAcctID, FixedPointNumber val) throws TransactionSplitNotFoundException {
 		if ( stockAcctID == null ) {
 			throw new IllegalArgumentException("argument <stockAcctID> is null");
@@ -569,6 +582,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	// ----------------------------
 
 	@Override
+    @Deprecated
 	public void setPricePerShare(final FixedPointNumber amt) throws TransactionSplitNotFoundException {
 		if ( amt == null ) {
 			throw new IllegalArgumentException("argument <amt> is null");
@@ -607,6 +621,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	// ----------------------------
 
 	@Override
+    @Deprecated
 	public void setPricePerShare(GCshAcctID stockAcctID, FixedPointNumber amt) throws TransactionSplitNotFoundException {
 		if ( stockAcctID == null ) {
 			throw new IllegalArgumentException("argument <stockAcctID> is null");
@@ -657,6 +672,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	// ----------------------------
 
 	@Override
+    @Deprecated
 	public void addFeeTax(GCshAcctID expAcctID, FixedPointNumber amt) throws TransactionSplitNotFoundException {
 		if ( expAcctID == null ) {
 			throw new IllegalArgumentException("argument <expAcctID> is null");
@@ -784,6 +800,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	// ----------------------------
 
 	@Override
+    @Deprecated
 	public void setGrossPrice(FixedPointNumber amt) throws TransactionSplitNotFoundException {
 		if ( amt == null ) {
 			throw new IllegalArgumentException("argument <amt> is null");
@@ -822,6 +839,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	// ----------------------------
 
 	@Override
+    @Deprecated
 	public void setGrossPrice(final GCshAcctID offsettingAcctID, final FixedPointNumber amt) throws TransactionSplitNotFoundException {
 		if ( offsettingAcctID == null ) {
 			throw new IllegalArgumentException("argument <offsettingAcctID> is null");

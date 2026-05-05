@@ -100,6 +100,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
+    @Deprecated
 	public FixedPointNumber getAmount() throws TransactionSplitNotFoundException {
     	return getSecondSplit().getValue();
 	}
@@ -118,6 +119,7 @@ public class GnuCashWritableSimpleTransactionImpl extends GnuCashWritableTransac
      * {@inheritDoc}
      */
 	@Override
+    @Deprecated
     public void setAmount(final FixedPointNumber amt) throws TransactionSplitNotFoundException {
 		if ( amt == null ) {
 			throw new IllegalArgumentException("argument <amt> is null");

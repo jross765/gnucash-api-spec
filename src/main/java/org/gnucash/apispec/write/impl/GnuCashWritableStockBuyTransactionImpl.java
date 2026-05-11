@@ -129,36 +129,36 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	}
 
 	@Override
-    public GnuCashWritableTransactionSplit getWritableExpensesSplit(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException {
-    	for ( GnuCashWritableTransactionSplit splt : getWritableExpensesSplits() ) {
-    		if ( splt.getAccountID().equals( expAcctID ) ) {
-    			return splt;
-    		}
-    	}
+    	public GnuCashWritableTransactionSplit getWritableExpensesSplit(GCshAcctID expAcctID)  throws TransactionSplitNotFoundException {
+    		for ( GnuCashWritableTransactionSplit splt : getWritableExpensesSplits() ) {
+    			if ( splt.getAccountID().equals( expAcctID ) ) {
+    				return splt;
+    			}
+	    	}
     	
-    	throw new TransactionSplitNotFoundException();
-    }
+    		throw new TransactionSplitNotFoundException();
+	    }
     
 	@Override
 	public List<GnuCashWritableTransactionSplit> getWritableExpensesSplits() throws TransactionSplitNotFoundException {
-    	if ( getSplitsCount() == 0 )
-    		throw new TransactionSplitNotFoundException();
+		if ( getSplitsCount() == 0 )
+    			throw new TransactionSplitNotFoundException();
 	
-    	List<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
+	    	List<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
     	
-    	for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
-    		result.add( (GnuCashWritableTransactionSplit) splt );
-    	}
+    		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
+    			result.add( (GnuCashWritableTransactionSplit) splt );
+	    	}
     	
-    	return result;
+    		return result;
 	}
 
 	@Override
 	public GnuCashWritableTransactionSplit getWritableOffsettingAccountSplit() throws TransactionSplitNotFoundException {
-    	if ( getSplitsCount() == 0 )
-    		throw new TransactionSplitNotFoundException();
+    		if ( getSplitsCount() == 0 )
+    			throw new TransactionSplitNotFoundException();
 	
-    	return (GnuCashWritableTransactionSplit) getOffsettingAccountSplit();
+	    	return (GnuCashWritableTransactionSplit) getOffsettingAccountSplit();
 	}
 
     // ---------------------------------------------------------------
@@ -900,8 +900,7 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 	@Override
     // ::TODO: Redundant to GnuCashStockBuyTransactionImpl.validate()
 	// (as well as the following helper functions)
-	public void validate() throws Exception
-	{
+	public void validate() throws Exception {
 		if ( getSplitsCount() < NOF_SPLITS_MIN ) {
 			String msg = "Trx ID " + getID() + ": Number of splits (altogether) is < " + NOF_SPLITS_MIN;
 			LOGGER.error("validate: " + msg);
@@ -973,13 +972,13 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getQuantity().doubleValue() <= 0.0 ) {
+		if ( splt.getQuantityRat().compareTo(BigFraction.ZERO) <= 0 ) {
 			String msg = "the split's quantity is not valid";
 			LOGGER.error("validateStockAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getValue().doubleValue() <= 0.0 ) {
+		if ( splt.getValueRat().compareTo(BigFraction.ZERO) <= 0 ) {
 			String msg = "the split's value is not valid";
 			LOGGER.error("validateStockAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
@@ -1005,18 +1004,19 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getQuantity().doubleValue() <= 0.0 ) {
+		if ( splt.getQuantityRat().compareTo(BigFraction.ZERO) <= 0 ) {
 			String msg = "the split's quantity is not valid";
 			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getValue().doubleValue() <= 0.0 ) {
+		if ( splt.getValueRat().compareTo(BigFraction.ZERO) <= 0 ) {
 			String msg = "the split's value is not valid";
 			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}
-		if ( ! splt.getQuantity().equals( splt.getValue() ) ) {
+
+		if ( ! splt.getQuantityRat().equals( splt.getValueRat() ) ) {
 			String msg = "the split's quantity is not equal to its value";
 			LOGGER.error("validateTaxesFeesAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
@@ -1042,19 +1042,19 @@ public class GnuCashWritableStockBuyTransactionImpl extends GnuCashWritableTrans
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getQuantity().doubleValue() >= 0.0 ) {
+		if ( splt.getQuantityRat().compareTo(BigFraction.ZERO) >= 0 ) {
 			String msg = "the split's quantity is not valid";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getValue().doubleValue() >= 0.0 ) {
+		if ( splt.getValueRat().compareTo(BigFraction.ZERO) >= 0 ) {
 			String msg = "the split's value is not valid";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( ! splt.getQuantity().equals( splt.getValue() ) ) {
+		if ( ! splt.getQuantityRat().equals( splt.getValueRat() ) ) {
 			String msg = "the split's quantity is not equal to its value";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);

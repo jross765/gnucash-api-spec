@@ -16,9 +16,9 @@ import org.gnucash.api.write.GnuCashWritableTransactionSplit;
 import org.gnucash.api.write.impl.GnuCashWritableFileImpl;
 import org.gnucash.api.write.impl.GnuCashWritableTransactionImpl;
 import org.gnucash.apispec.ConstTest;
-import org.gnucash.apispec.read.impl.GnuCashStockBuyTransactionImpl;
+import org.gnucash.apispec.read.impl.GnuCashStockBuySellTransactionImpl;
 import org.gnucash.apispec.read.impl.TestGnuCashStockBuyTransactionImpl;
-import org.gnucash.apispec.write.GnuCashWritableStockBuyTransaction;
+import org.gnucash.apispec.write.GnuCashWritableStockBuySellTransaction;
 import org.gnucash.base.basetypes.simple.GCshAcctID;
 import org.gnucash.base.basetypes.simple.GCshTrxID;
 import org.junit.Before;
@@ -100,8 +100,8 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 
 		assertEquals(TRX_1_ID, genTrx.getID());
 		
-		GnuCashStockBuyTransactionImpl roSpecTrx = new GnuCashStockBuyTransactionImpl((GnuCashTransactionImpl) genTrx);
-		GnuCashWritableStockBuyTransaction specTrx = new GnuCashWritableStockBuyTransactionImpl(roSpecTrx);
+		GnuCashStockBuySellTransactionImpl roSpecTrx = new GnuCashStockBuySellTransactionImpl((GnuCashTransactionImpl) genTrx);
+		GnuCashWritableStockBuySellTransaction specTrx = new GnuCashWritableStockBuySellTransactionImpl(roSpecTrx);
 		assertNotEquals(null, specTrx);
 		
 		// ---
@@ -162,11 +162,11 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 		assertNotEquals(null, genTrx);
 		assertEquals(TRX_1_ID, genTrx.getID());
 		
-		GnuCashStockBuyTransactionImpl specTrxRO = new GnuCashStockBuyTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
+		GnuCashStockBuySellTransactionImpl specTrxRO = new GnuCashStockBuySellTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
 		assertNotEquals(null, specTrxRO);
 		assertEquals(TRX_1_ID, specTrxRO.getID());
 
-		GnuCashWritableStockBuyTransaction specTrxRW = new GnuCashWritableStockBuyTransactionImpl(specTrxRO);
+		GnuCashWritableStockBuySellTransaction specTrxRW = new GnuCashWritableStockBuySellTransactionImpl(specTrxRO);
 		assertNotEquals(null, specTrxRW);
 		assertEquals(TRX_1_ID, specTrxRW.getID());
 		
@@ -222,11 +222,11 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 		assertNotEquals(null, genTrx);
 		assertEquals(TRX_1_ID, genTrx.getID());
 		
-		GnuCashStockBuyTransactionImpl specTrxRO = new GnuCashStockBuyTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
+		GnuCashStockBuySellTransactionImpl specTrxRO = new GnuCashStockBuySellTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
 		assertNotEquals(null, specTrxRO);
 		assertEquals(TRX_1_ID, specTrxRO.getID());
 
-		GnuCashWritableStockBuyTransaction specTrxRW = new GnuCashWritableStockBuyTransactionImpl(specTrxRO);
+		GnuCashWritableStockBuySellTransaction specTrxRW = new GnuCashWritableStockBuySellTransactionImpl(specTrxRO);
 		assertNotEquals(null, specTrxRW);
 		assertEquals(TRX_1_ID, specTrxRW.getID());
 		
@@ -303,11 +303,11 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 		assertNotEquals(null, genTrx);
 		assertEquals(TRX_1_ID, genTrx.getID());
 		
-		GnuCashStockBuyTransactionImpl specTrxRO = new GnuCashStockBuyTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
+		GnuCashStockBuySellTransactionImpl specTrxRO = new GnuCashStockBuySellTransactionImpl((GnuCashWritableTransactionImpl) genTrx);
 		assertNotEquals(null, specTrxRO);
 		assertEquals(TRX_1_ID, specTrxRO.getID());
 
-		GnuCashWritableStockBuyTransaction specTrxRW = new GnuCashWritableStockBuyTransactionImpl(specTrxRO);
+		GnuCashWritableStockBuySellTransaction specTrxRW = new GnuCashWritableStockBuySellTransactionImpl(specTrxRO);
 		assertNotEquals(null, specTrxRW);
 		assertEquals(TRX_1_ID, specTrxRW.getID());
 		
@@ -374,7 +374,7 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 
 	// ---------------------------------------------------------------
 
-	private void test02_1_check_memory(GnuCashWritableStockBuyTransaction trx) throws Exception {
+	private void test02_1_check_memory(GnuCashWritableStockBuySellTransaction trx) throws Exception {
 		assertEquals(4, trx.getSplitsCount()); // unchanged
 		
 		assertEquals("c3ae14400ec843f9bf63f5ef69a31528", trx.getStockAccountSplit().getID().toString());
@@ -417,7 +417,7 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 		assertNotEquals(null, genTrx);
 		assertEquals(TRX_1_ID, genTrx.getID());
 
-		GnuCashStockBuyTransactionImpl specTrxRO = new GnuCashStockBuyTransactionImpl((GnuCashTransactionImpl) genTrx);
+		GnuCashStockBuySellTransactionImpl specTrxRO = new GnuCashStockBuySellTransactionImpl((GnuCashTransactionImpl) genTrx);
 		assertNotEquals(null, specTrxRO);
 		assertEquals(TRX_1_ID, specTrxRO.getID());
 		
@@ -459,7 +459,7 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 
 	// ---------------------------------------------------------------
 
-	private void test02_3_check_memory(GnuCashWritableStockBuyTransaction trx) throws Exception {
+	private void test02_3_check_memory(GnuCashWritableStockBuySellTransaction trx) throws Exception {
 		assertEquals(5, trx.getSplitsCount()); // changed
 		
 		assertEquals("c3ae14400ec843f9bf63f5ef69a31528", trx.getStockAccountSplit().getID().toString());
@@ -504,7 +504,7 @@ public class TestGnuCashWritableStockBuyTransactionImpl {
 		assertNotEquals(null, genTrx);
 		assertEquals(TRX_1_ID, genTrx.getID());
 
-		GnuCashStockBuyTransactionImpl specTrxRO = new GnuCashStockBuyTransactionImpl((GnuCashTransactionImpl) genTrx);
+		GnuCashStockBuySellTransactionImpl specTrxRO = new GnuCashStockBuySellTransactionImpl((GnuCashTransactionImpl) genTrx);
 		assertNotEquals(null, specTrxRO);
 		assertEquals(TRX_1_ID, specTrxRO.getID());
 		

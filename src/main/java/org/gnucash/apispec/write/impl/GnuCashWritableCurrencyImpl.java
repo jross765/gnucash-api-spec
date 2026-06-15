@@ -24,7 +24,7 @@ public class GnuCashWritableCurrencyImpl extends GnuCashWritableCommodityImpl
     }
 
 	public GnuCashWritableCurrencyImpl(GnuCashWritableCommodityImpl cmdty) {
-		super(cmdty.getJwsdpPeer(), cmdty.getGnuCashFile());
+		super(cmdty.getJwsdpPeer(), cmdty.getWritableGnuCashFile());
 	}
 
 	public GnuCashWritableCurrencyImpl(GnuCashCurrencyImpl curr) {

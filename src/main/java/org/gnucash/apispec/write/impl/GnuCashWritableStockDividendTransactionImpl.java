@@ -636,7 +636,7 @@ public class GnuCashWritableStockDividendTransactionImpl extends GnuCashWritable
 	@Override
 	public void clearFeesTaxes() throws TransactionSplitNotFoundException {
 		for ( GnuCashWritableTransactionSplit splt : getWritableExpensesSplits() ) {
-			getGnuCashFile().removeTransactionSplit(splt);
+			getWritableGnuCashFile().removeTransactionSplit(splt);
 		}
 	}
 

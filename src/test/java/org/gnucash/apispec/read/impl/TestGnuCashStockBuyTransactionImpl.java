@@ -12,7 +12,7 @@ import org.gnucash.api.read.GnuCashTransaction;
 import org.gnucash.api.read.impl.GnuCashFileImpl;
 import org.gnucash.api.read.impl.GnuCashTransactionImpl;
 import org.gnucash.apispec.ConstTest;
-import org.gnucash.apispec.read.GnuCashStockBuyTransaction;
+import org.gnucash.apispec.read.GnuCashStockBuySellTransaction;
 import org.gnucash.base.basetypes.simple.GCshTrxID;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +73,7 @@ public class TestGnuCashStockBuyTransactionImpl {
 		assertEquals(2, genTrx.getSplitsCount());
 		
 		try {
-			GnuCashStockBuyTransaction specTrx = new GnuCashStockBuyTransactionImpl((GnuCashTransactionImpl) genTrx);
+			GnuCashStockBuySellTransaction specTrx = new GnuCashStockBuySellTransactionImpl((GnuCashTransactionImpl) genTrx);
 			assertEquals(0, 1);
 		} catch ( Exception ext ) {
 			assertEquals(0, 0);
@@ -87,7 +87,7 @@ public class TestGnuCashStockBuyTransactionImpl {
 
 		assertEquals(TRX_1_ID, genTrx.getID());
 		
-		GnuCashStockBuyTransaction specTrx = new GnuCashStockBuyTransactionImpl((GnuCashTransactionImpl) genTrx);
+		GnuCashStockBuySellTransaction specTrx = new GnuCashStockBuySellTransactionImpl((GnuCashTransactionImpl) genTrx);
 		assertNotEquals(null, specTrx);
 		
 		// ---

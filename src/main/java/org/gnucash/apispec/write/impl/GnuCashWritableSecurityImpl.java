@@ -22,7 +22,7 @@ public class GnuCashWritableSecurityImpl extends GnuCashWritableCommodityImpl
     }
 
 	public GnuCashWritableSecurityImpl(GnuCashWritableCommodityImpl cmdty) {
-		super(cmdty.getJwsdpPeer(), cmdty.getGnuCashFile());
+		super(cmdty.getJwsdpPeer(), cmdty.getWritableGnuCashFile());
 	}
 
 	public GnuCashWritableSecurityImpl(GnuCashSecurityImpl sec) {

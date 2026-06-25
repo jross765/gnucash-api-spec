@@ -225,7 +225,8 @@ public class GnuCashWritableStockBuySellTransactionImpl extends GnuCashWritableT
     		throw new TransactionSplitNotFoundException();
 	
 		for ( GnuCashTransactionSplit splt : getSplits() ) {
-			if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ) {
+			if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ||
+				 splt.getAccount().getType() == GnuCashAccount.Type.ASSET ) {
 				return splt;
 			}
 		}
@@ -487,11 +488,12 @@ public class GnuCashWritableStockBuySellTransactionImpl extends GnuCashWritableT
 		
 		// ---
 		
-		if ( offsettingAcct.getType() != GnuCashAccount.Type.BANK ) {
+		if ( offsettingAcct.getType() != GnuCashAccount.Type.BANK &&
+                     offsettingAcct.getType() != GnuCashAccount.Type.ASSET ) {
 			LOGGER.error("setOffsetttingAcct: " +
 						"Stock-buy transaction " + getID() + ": " +
-						"Account with ID " + offsettingAcct.getID() + " is not of type " + GnuCashAccount.Type.BANK);
-			throw new IllegalArgumentException("Account with ID " + offsettingAcct.getID() + " is not of type " + GnuCashAccount.Type.BANK);
+						"Account with ID " + offsettingAcct.getID() + " is not of type " + GnuCashAccount.Type.BANK + " or " + GnuCashAccount.Type.ASSET);
+			throw new IllegalArgumentException("Account with ID " + offsettingAcct.getID() + " is not of type " + GnuCashAccount.Type.BANK + " or " + GnuCashAccount.Type.ASSET);
 		}
 		
 		boolean acctChange = false;
@@ -969,7 +971,8 @@ public class GnuCashWritableStockBuySellTransactionImpl extends GnuCashWritableT
 	// ----------------------------
 	
 	protected void validateStockAcctSplit(final GnuCashTransactionSplit splt) throws TransactionValidationException {
-		if ( splt.getAction() != GnuCashTransactionSplit.Action.BUY ) {
+		if ( splt.getAction() != GnuCashTransactionSplit.Action.BUY &&
+			 splt.getAction() != GnuCashTransactionSplit.Action.SELL ) {
 			String msg = "the split's action is not valid";
 			LOGGER.error("validateStockAcctSplit: " + msg);
 			throw new TransactionValidationException("msg");
@@ -1048,7 +1051,8 @@ public class GnuCashWritableStockBuySellTransactionImpl extends GnuCashWritableT
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getAccount().getType() != GnuCashAccount.Type.BANK ) {
+		if ( splt.getAccount().getType() != GnuCashAccount.Type.BANK &&
+			 splt.getAccount().getType() != GnuCashAccount.Type.ASSET ) {
 			String msg = "the split's account's type is not valid";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
@@ -1069,7 +1073,7 @@ public class GnuCashWritableStockBuySellTransactionImpl extends GnuCashWritableT
 		}
 		
 		// Dto.
-		if ( splt.getValueRat().compareTo(BigFraction.ZERO) >= 0 ) {
+		if ( splt.getValueRat().compareTo(BigFraction.ZERO) == 0 ) {
 			String msg = "the split's value is not valid";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);

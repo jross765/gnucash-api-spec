@@ -124,7 +124,8 @@ public class GnuCashStockBuySellTransactionImpl extends GnuCashTransactionImpl
 			} catch ( Exception exc ) {
 				throw new IllegalArgumentException("argument <trx>: something went wrong");
 			}
-		} else if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ) {
+		} else if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ||
+					splt.getAccount().getType() == GnuCashAccount.Type.ASSET ) {
 			try {
 				validateOffsettingAcctSplit(splt);
 			} catch ( TransactionValidationException exc ) {
@@ -221,7 +222,7 @@ public class GnuCashStockBuySellTransactionImpl extends GnuCashTransactionImpl
 		validateStockAcctSplit( getStockAccountSplit() );
 		
 		for ( GnuCashTransactionSplit splt : getExpensesSplits() ) {
-				validateTaxesFeesAcctSplit( splt );
+			validateTaxesFeesAcctSplit( splt );
 		}
 		
 		validateOffsettingAcctSplit( getOffsettingAccountSplit() );
@@ -238,7 +239,8 @@ public class GnuCashStockBuySellTransactionImpl extends GnuCashTransactionImpl
 	// ----------------------------
 	
 	protected void validateStockAcctSplit(final GnuCashTransactionSplit splt) throws TransactionValidationException {
-		if ( splt.getAction() != GnuCashTransactionSplit.Action.BUY ) {
+		if ( splt.getAction() != GnuCashTransactionSplit.Action.BUY &&
+			 splt.getAction() != GnuCashTransactionSplit.Action.SELL ) {
 			String msg = "the split's action is not valid";
 			LOGGER.error("validateStockAcctSplit: " + msg);
 			throw new TransactionValidationException("msg");
@@ -317,7 +319,8 @@ public class GnuCashStockBuySellTransactionImpl extends GnuCashTransactionImpl
 			throw new TransactionValidationException(msg);
 		}
 		
-		if ( splt.getAccount().getType() != GnuCashAccount.Type.BANK ) {
+		if ( splt.getAccount().getType() != GnuCashAccount.Type.BANK &&
+			 splt.getAccount().getType() != GnuCashAccount.Type.ASSET ) {
 			String msg = "the split's account's type is not valid";
 			LOGGER.error("validateOffsettingAcctSplit: " + msg);
 			throw new TransactionValidationException(msg);
@@ -412,7 +415,8 @@ public class GnuCashStockBuySellTransactionImpl extends GnuCashTransactionImpl
     		throw new TransactionSplitNotFoundException();
 	
 		for ( GnuCashTransactionSplit splt : getSplits() ) {
-			if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ) {
+			if ( splt.getAccount().getType() == GnuCashAccount.Type.BANK ||
+				 splt.getAccount().getType() == GnuCashAccount.Type.ASSET ) {
 				return splt;
 			}
 		}

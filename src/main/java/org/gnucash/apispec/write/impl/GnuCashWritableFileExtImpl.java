@@ -11,6 +11,7 @@ import java.util.List;
 import org.gnucash.api.read.GnuCashCommodity;
 import org.gnucash.api.read.GnuCashTransactionSplit;
 import org.gnucash.api.read.impl.GnuCashCommodityImpl;
+import org.gnucash.api.read.impl.GnuCashTransactionSplitImpl;
 import org.gnucash.api.write.GnuCashWritableCommodity;
 import org.gnucash.api.write.GnuCashWritableTransactionSplit;
 import org.gnucash.api.write.ObjectCascadeException;
@@ -205,7 +206,7 @@ public class GnuCashWritableFileExtImpl extends GnuCashWritableFileImpl
 		ArrayList<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
 		
 		for ( GnuCashTransactionSplit splt : getTransactionSplitsBySecID(secID) ) {
-			result.add( new GnuCashWritableTransactionSplitImpl(splt) );
+			result.add( new GnuCashWritableTransactionSplitImpl((GnuCashTransactionSplitImpl) splt) );
 		}
 		
 		return result;
@@ -216,7 +217,7 @@ public class GnuCashWritableFileExtImpl extends GnuCashWritableFileImpl
 		ArrayList<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
 		
 		for ( GnuCashTransactionSplit splt : getTransactionSplitsByCurrID(currID) ) {
-			result.add( new GnuCashWritableTransactionSplitImpl(splt) );
+			result.add( new GnuCashWritableTransactionSplitImpl((GnuCashTransactionSplitImpl) splt) );
 		}
 		
 		return result;
@@ -227,7 +228,7 @@ public class GnuCashWritableFileExtImpl extends GnuCashWritableFileImpl
 		ArrayList<GnuCashWritableTransactionSplit> result = new ArrayList<GnuCashWritableTransactionSplit>();
 		
 		for ( GnuCashTransactionSplit splt : getTransactionSplitsByCurr(curr) ) {
-			result.add( new GnuCashWritableTransactionSplitImpl(splt) );
+			result.add( new GnuCashWritableTransactionSplitImpl((GnuCashTransactionSplitImpl) splt) );
 		}
 		
 		return result;
